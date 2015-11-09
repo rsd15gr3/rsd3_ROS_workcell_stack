@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/clonecomputer/catkin_ws/src/WSG50/wsg_50/src/msg.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+wsg_50/common.h
+/home/clonecomputer/catkin_ws/src/WSG50/wsg_50/src/wsg_50/common.h
+wsg_50/checksum.h
+/home/clonecomputer/catkin_ws/src/WSG50/wsg_50/src/wsg_50/checksum.h
+wsg_50/interface.h
+/home/clonecomputer/catkin_ws/src/WSG50/wsg_50/src/wsg_50/interface.h
+wsg_50/msg.h
+/home/clonecomputer/catkin_ws/src/WSG50/wsg_50/src/wsg_50/msg.h
+
+include/wsg_50/checksum.h
+
+include/wsg_50/common.h
+
+include/wsg_50/interface.h
+
+include/wsg_50/msg.h
+common.h
+include/wsg_50/common.h
+interface.h
+include/wsg_50/interface.h
+

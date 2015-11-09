@@ -1,0 +1,30 @@
+<!-- -->
+<launch> 
+  <!--<include file="$(find video_stream_opencv)/launch/creative_hd.launch" />-->
+
+  <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/video0" />
+    <param name="image_width" value="1920" />
+    <param name="image_height" value="1080" />
+    <param name="pixel_format" value="yuyv" />
+    <param name="camera_frame_id" value="/camera_link" />
+    <param name="framerate" value="30" />
+    <param name="autofocus" value="false" />
+    <param name="focus" value="-1" />
+    <param name="camera_info_url" value="package://robot_camera_launch/config/robot_camera.yaml" /> 
+    <param name="camera_name" value="robot_camera" />
+    <param name="io_method" value="mmap"/>
+  </node>
+
+    <!--
+    <node name="img_proc" pkg="image_proc" type="image_proc" ns="usb_cam">
+
+        <param name="queue_size" value="5" />
+    </node>
+    -->
+    <node name="brick_detector" pkg="brick_detection" type="brick_detection_node" output="screen" > 
+    </node>
+
+    <!--<node name="brick_client" pkg="brick_client" type="brick_client_node" output="screen" > 
+    </node> -->
+</launch>

@@ -1,0 +1,11 @@
+<!-- Kuka ROS Node launch file -->
+
+<launch>
+	<group ns="kuka_ros">
+		<node pkg="kuka_ros" name="KukaROS" type="kuka_ros">
+			<param name="CmdServiceName" value="/KukaNode"/>
+			<param name="ServerIP" value="192.168.100.50"/>
+			<param name="ServerPort" value="49002"/>
+		</node>
+	</group>
+</launch> 

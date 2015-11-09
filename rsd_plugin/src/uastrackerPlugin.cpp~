@@ -1,0 +1,118 @@
+#include "uastrackerPlugin.hpp"
+#include <cv_bridge/cv_bridge.h>
+#include <math.h>
+#include <rw/models/Device.hpp>
+#include <rws/RobWorkStudio.hpp>
+#include <QPushButton>
+
+
+using namespace rw::common;
+using namespace rw::graphics;
+using namespace rw::kinematics;
+using namespace rw::models;
+using namespace rw::sensor;
+using namespace rwlibs::opengl;
+
+using namespace rws;
+
+
+uastrackerPlugin::uastrackerPlugin():
+    RobWorkStudioPlugin("uastracker plugin", QIcon(":/pa_icon.png"))
+{
+	setupUi(this);
+	char** argv = NULL;
+        int argc = 0;
+        ros::init(argc, argv,"uastracker_plugin");
+	
+        _timer = new QTimer(this);
+        connect(_timer, SIGNAL(timeout()), this, SLOT(timer()));
+
+	// now connect stuff from the ui component
+	connect(_btn0    ,SIGNAL(pressed()), this, SLOT(btnPressed()) );
+	//connect(_btn1    ,SIGNAL(pressed()), this, SLOT(btnPressed()) );
+
+        _qtRos = new QtROS();
+
+        connect(this, SIGNAL(quitNow()), _qtRos, SLOT(quitNow()));
+        
+	qRegisterMetaType<cv::Mat>("cv::Mat");
+        connect(_qtRos, SIGNAL(newImage(cv::Mat)), this, SLOT(newImage(cv::Mat)));
+        connect(_qtRos, SIGNAL(newPos(double,double,double,double)), this, SLOT(newPos(double,double,double,double)));      
+}
+
+uastrackerPlugin::~uastrackerPlugin()
+{
+}
+
+
+void uastrackerPlugin::newImage(cv::Mat image){
+        /*if(image.rows > 0 and image.cols > 0)
+	{
+        cv::Mat temp; // make the same cv::Mat
+        cvtColor(image, temp,CV_BGR2RGB); // cvtColor Makes a copt, that what i need
+        QImage dest((uchar*) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
+        QImage dest2(dest);
+        dest2.detach(); // enforce deep copy
+
+        QPixmap p = QPixmap::fromImage(dest2);
+        unsigned int maxW = 400;
+        unsigned int maxH = 800;
+        _label->setPixmap(p.scaled(maxW,maxH,Qt::KeepAspectRatio));
+	}*/
+}
+
+void uastrackerPlugin::newPos(double x,double y,double z,double r){
+	//Log::infoLog() << "X: " << (int)x << " Y: " << (int)y << " Z: " << (int)z << " R: " << (int)r << "\n";
+        updatestate(x,y,z,r);
+}
+
+
+void uastrackerPlugin::initialize() {
+	getRobWorkStudio()->stateChangedEvent().add(boost::bind(&uastrackerPlugin::stateChangedListener, this, _1), this);
+}
+
+void uastrackerPlugin::updatestate(double x,double y,double z,double r) {
+	Q qq = Q(4,x/100,y/100,z/100,r);
+	_device->setQ(qq,_state);
+	getRobWorkStudio()->setState(_state);
+}
+
+void uastrackerPlugin::open(WorkCell* workcell)
+{
+	_wc = workcell;
+	_state = _wc->getDefaultState();
+	_device = _wc->findDevice("Drone");
+}
+
+
+void uastrackerPlugin::close() {
+     _wc = NULL;
+}
+
+cv::Mat uastrackerPlugin::toOpenCVImage(const Image& img) {
+	cv::Mat res(img.getHeight(),img.getWidth(), CV_8SC3);
+	res.data = (uchar*)img.getImageData();
+	return res;
+}
+
+void uastrackerPlugin::btnPressed() {
+	QObject *obj = sender();
+	if(obj==_btn0){
+		log().info() << "Button 0 start\n";
+                _qtRos->start();
+                
+	} /*else if(obj==_btn1){
+		log().info() << "Button 1\n";
+                emit quitNow();
+	}*/
+}
+
+void uastrackerPlugin::timer() {
+        _timer->stop();
+}
+
+void uastrackerPlugin::stateChangedListener(const State& state) {
+	_state = state;
+}
+
+Q_EXPORT_PLUGIN(uastrackerPlugin);

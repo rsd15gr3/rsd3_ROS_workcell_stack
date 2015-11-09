@@ -1,0 +1,16 @@
+<CollisionSetup>
+    <Exclude>
+
+     <FramePair first="Foot" second="KR6.Base"/>
+     <FramePair first="conveyorBelt" second="BackFence"/>
+     <FramePair first="LeftFence" second="BackFence"/>
+     <FramePair first="RightFence" second="BackFence"/>
+     <FramePair first="WSG50.Base" second="KR6.Joint6"/>
+     <FramePair first="CameraSim" second="KR6.Joint1"/>
+     <FramePair first="CameraSim" second="KR6.Joint2"/>
+     <FramePair first="CameraSim" second="KR6.Joint3"/>
+     <FramePair first="CameraSim" second="KR6.Joint4"/>
+     <FramePair first="CameraSim" second="KR6.Joint5"/>
+     <FramePair first="CameraSim" second="KR6.Joint6"/>
+    </Exclude>
+</CollisionSetup>

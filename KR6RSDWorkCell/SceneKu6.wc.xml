@@ -1,0 +1,112 @@
+<WorkCell name="SceneKU6">
+
+
+	<Frame name="Foot" refframe="WORLD">
+		<RPY> 0 0 0 </RPY>
+		<Pos> 0 -0.14 0 </Pos>
+		<Drawable name="LeftFenceGeo" refframe="LeftFence">
+			<Polytope file="Geometry/foot" />
+		</Drawable>
+	</Frame>
+
+	<Frame name="Robot" refframe="Foot">
+		<RPY> 0 0 0 </RPY>
+		<Pos>0 0.0 0.812</Pos>
+	</Frame>
+	<Include file="KR6/kr6.xml" /> 
+
+
+  	<Frame name="ToolMount" refframe="KR6.ToolBase">
+   		<RPY>180 0 90</RPY> 
+		<Pos> 0 0 0 </Pos>
+ 	</Frame>
+	<Include file="WSG50/WSG50_camera.wc.xml"/>
+
+	<Frame name="BackFence" refframe="WORLD">	
+		<RPY> 0 0 0 </RPY>
+		<Pos> -0.80 -0.175 0</Pos>
+		<Drawable name="workcellsidebackgeo" refframe="BackFence">
+			<RPY> 0 0 90 </RPY>
+			<Pos> 0 0 0 </Pos>
+			<Polytope file="Geometry/workcellback" />
+		</Drawable>
+			<CollisionModel name="workcellsidegeo" refframe="BackFence">
+			<RPY> 0 0 90 </RPY>
+			<Pos> 0 0 0 </Pos>
+			<Polytope file="Geometry/workcellback_full" />
+		</CollisionModel>
+	</Frame>
+
+	<Frame name="LeftFence" refframe="WORLD">
+		<RPY> 0 0 0 </RPY>
+		<Pos> 0.6 -0.95 0 </Pos>
+		
+		<Drawable name="workcellsidegeo" refframe="LeftFence">
+			<RPY> 0 0 90 </RPY>
+			<Pos> 0 0 0 </Pos>
+			<Polytope file="Geometry/workcellside" />
+		</Drawable>
+		<CollisionModel name="workcellsidegeo" refframe="LeftFence">
+			<RPY> 0 0 90 </RPY>
+			<Pos> 0 0 0 </Pos>
+			<Polytope file="Geometry/workcellside_full" />
+		</CollisionModel>
+	</Frame>
+
+	<Frame name="RightFence" refframe="WORLD">
+		<RPY> 0 0 0 </RPY>
+		<Pos> 0.6 0.60 0</Pos>
+		<Drawable name="workcellsiderightgeo" refframe="RightFence">
+			<RPY> 0 0 90 </RPY>
+			<Pos> 0 0 0 </Pos>
+			<Polytope file="Geometry/workcellside" />
+		</Drawable>
+				<CollisionModel name="workcellsidegeo" refframe="RightFence">
+			<RPY> 0 0 90 </RPY>
+			<Pos> 0 0 0 </Pos>
+			<Polytope file="Geometry/workcellside_full" />
+		</CollisionModel>
+	</Frame>
+
+	<Frame name="conveyorBelt" refframe="WORLD">
+		<RPY> 0 0 0 </RPY>
+		<Pos> 0.19 -0.68 0.02</Pos>
+		<Drawable name="conveyorBeltgeo" refframe="LeftFence">
+			<RPY> 0 0 90 </RPY>
+			<Pos> 0 0 0 </Pos>
+			<Polytope file="Geometry/conveyorBelt" />
+		</Drawable>
+	</Frame>
+	<Frame name="conveyorBeltTop" refframe="conveyorBelt">
+		<RPY> 0 17.5 0 </RPY>
+		<Pos> -0.15 0 0.68</Pos>
+	</Frame>
+	<Frame name="conveyorBeltPickupCenter" refframe="conveyorBeltTop">
+		<RPY> 0 0 0 </RPY>
+		<Pos> -0.108 0.005 0</Pos>
+	</Frame>
+
+	<Frame name="Table" refframe="WORLD">
+		<RPY> 0 0 0 </RPY>
+		<Pos> 1.17 0.29 0 </Pos>
+		<Drawable name="Tablegeo" refframe="LeftFence">
+			<RPY> -90 0 90 </RPY>
+			<Pos> 0 0 0 </Pos>
+			<Polytope file="Geometry/Table" />
+		</Drawable>
+	</Frame>
+
+
+
+
+
+
+	
+
+
+
+
+
+
+	<CollisionSetup file="CollisionSetup.xml" />
+</WorkCell>
