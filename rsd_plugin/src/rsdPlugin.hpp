@@ -3,7 +3,7 @@
 #include "../../rsd_plugin-build/ui_rsdPlugin.h"
 #include "qtros.h"
 #include <ros/ros.h>
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include <sensor_msgs/Image.h>
 #include <image_transport/image_transport.h>
 #include <rw/rw.hpp>
@@ -16,6 +16,7 @@
 #include <rw/models/WorkCell.hpp>
 #include <rw/models/Device.hpp>
 
+#include "kuka_ros/setConfiguration.h"
 
 using namespace std;
 using namespace rw::common;
@@ -46,7 +47,7 @@ private slots:
 	void timer();
 	void stateChangedListener(const rw::kinematics::State& state);
     void newImage(cv::Mat);
-    void updateConfiguration(kuka_rsi::getConfiguration);
+    void updateConfiguration(kuka_ros::getConfiguration);
 
 signals:
 	void quitNow();

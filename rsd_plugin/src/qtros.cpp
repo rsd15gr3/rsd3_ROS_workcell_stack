@@ -9,7 +9,8 @@
 QtROS::QtROS(): _it(_nh) {
   ROS_INFO("Connected to roscore");
   _image_sub = _it.subscribe(SUBSCRIBER, 1, &QtROS::imageCallback, this);
-  //_q_client = _nh.serviceClient<kuka_rsi::getConfiguration>("/GetConfiguration");
+
+  //_q_client = _nh.serviceClient<kuka_ros::getConfiguration>("/GetConfiguration");
   quitfromgui = false; }
 
 void QtROS::quitNow(){ 

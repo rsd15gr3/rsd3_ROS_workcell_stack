@@ -39,21 +39,25 @@ public:
     QDoubleSpinBox *_xPosdoubleSpinBox;
     QFrame *line;
     QLabel *_label_RobotCamImage;
+    QPushButton *_btn7;
     QLabel *label_4;
     QDoubleSpinBox *_yRotdoubleSpinBox;
-    QPushButton *_btn7;
-    QLabel *label_2;
     QPushButton *_btn4;
+    QLabel *label_2;
     QPushButton *_btn2;
-    QPushButton *_btn3;
     QPushButton *_btn1;
+    QPushButton *_btn3;
     QPushButton *_btn6;
+    QPushButton *_btn8;
+    QPushButton *_btn9;
+    QPushButton *_btn10;
+    QPushButton *_btn11;
 
     void setupUi(QDockWidget *SamplePlugin)
     {
         if (SamplePlugin->objectName().isEmpty())
             SamplePlugin->setObjectName(QString::fromUtf8("SamplePlugin"));
-        SamplePlugin->resize(468, 479);
+        SamplePlugin->resize(468, 495);
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
@@ -118,6 +122,12 @@ public:
 
         gridLayout->addWidget(_label_RobotCamImage, 0, 0, 1, 4);
 
+        _btn7 = new QPushButton(dockWidgetContents);
+        _btn7->setObjectName(QString::fromUtf8("_btn7"));
+        _btn7->setMinimumSize(QSize(0, 50));
+
+        gridLayout->addWidget(_btn7, 8, 0, 1, 1);
+
         label_4 = new QLabel(dockWidgetContents);
         label_4->setObjectName(QString::fromUtf8("label_4"));
         label_4->setMinimumSize(QSize(0, 0));
@@ -141,11 +151,11 @@ public:
 
         gridLayout->addWidget(_yRotdoubleSpinBox, 6, 2, 1, 1);
 
-        _btn7 = new QPushButton(dockWidgetContents);
-        _btn7->setObjectName(QString::fromUtf8("_btn7"));
-        _btn7->setMinimumSize(QSize(0, 50));
+        _btn4 = new QPushButton(dockWidgetContents);
+        _btn4->setObjectName(QString::fromUtf8("_btn4"));
+        _btn4->setMinimumSize(QSize(0, 50));
 
-        gridLayout->addWidget(_btn7, 8, 0, 1, 1);
+        gridLayout->addWidget(_btn4, 7, 0, 1, 1);
 
         label_2 = new QLabel(dockWidgetContents);
         label_2->setObjectName(QString::fromUtf8("label_2"));
@@ -154,23 +164,11 @@ public:
 
         gridLayout->addWidget(label_2, 5, 1, 1, 1);
 
-        _btn4 = new QPushButton(dockWidgetContents);
-        _btn4->setObjectName(QString::fromUtf8("_btn4"));
-        _btn4->setMinimumSize(QSize(0, 50));
-
-        gridLayout->addWidget(_btn4, 7, 0, 1, 1);
-
         _btn2 = new QPushButton(dockWidgetContents);
         _btn2->setObjectName(QString::fromUtf8("_btn2"));
         _btn2->setMinimumSize(QSize(0, 50));
 
-        gridLayout->addWidget(_btn2, 9, 0, 1, 1);
-
-        _btn3 = new QPushButton(dockWidgetContents);
-        _btn3->setObjectName(QString::fromUtf8("_btn3"));
-        _btn3->setMinimumSize(QSize(0, 50));
-
-        gridLayout->addWidget(_btn3, 8, 1, 1, 1);
+        gridLayout->addWidget(_btn2, 10, 0, 1, 1);
 
         _btn1 = new QPushButton(dockWidgetContents);
         _btn1->setObjectName(QString::fromUtf8("_btn1"));
@@ -178,11 +176,41 @@ public:
 
         gridLayout->addWidget(_btn1, 7, 1, 1, 1);
 
+        _btn3 = new QPushButton(dockWidgetContents);
+        _btn3->setObjectName(QString::fromUtf8("_btn3"));
+        _btn3->setMinimumSize(QSize(0, 50));
+
+        gridLayout->addWidget(_btn3, 8, 1, 1, 1);
+
         _btn6 = new QPushButton(dockWidgetContents);
         _btn6->setObjectName(QString::fromUtf8("_btn6"));
         _btn6->setMinimumSize(QSize(0, 50));
 
         gridLayout->addWidget(_btn6, 8, 2, 1, 1);
+
+        _btn8 = new QPushButton(dockWidgetContents);
+        _btn8->setObjectName(QString::fromUtf8("_btn8"));
+        _btn8->setMinimumSize(QSize(0, 50));
+
+        gridLayout->addWidget(_btn8, 10, 1, 1, 1);
+
+        _btn9 = new QPushButton(dockWidgetContents);
+        _btn9->setObjectName(QString::fromUtf8("_btn9"));
+        _btn9->setMinimumSize(QSize(0, 50));
+
+        gridLayout->addWidget(_btn9, 9, 0, 1, 1);
+
+        _btn10 = new QPushButton(dockWidgetContents);
+        _btn10->setObjectName(QString::fromUtf8("_btn10"));
+        _btn10->setMinimumSize(QSize(0, 50));
+
+        gridLayout->addWidget(_btn10, 9, 1, 1, 1);
+
+        _btn11 = new QPushButton(dockWidgetContents);
+        _btn11->setObjectName(QString::fromUtf8("_btn11"));
+        _btn11->setMinimumSize(QSize(0, 50));
+
+        gridLayout->addWidget(_btn11, 9, 2, 1, 1);
 
 
         verticalLayout_2->addLayout(gridLayout);
@@ -204,15 +232,19 @@ public:
         _btn0->setText(QApplication::translate("SamplePlugin", "Start", 0, QApplication::UnicodeUTF8));
         _xPosdoubleSpinBox->setSuffix(QApplication::translate("SamplePlugin", " m", 0, QApplication::UnicodeUTF8));
         _label_RobotCamImage->setText(QString());
+        _btn7->setText(QApplication::translate("SamplePlugin", "backoff from grasp", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("SamplePlugin", "Test functions", 0, QApplication::UnicodeUTF8));
         _yRotdoubleSpinBox->setSuffix(QApplication::translate("SamplePlugin", " radians", 0, QApplication::UnicodeUTF8));
-        _btn7->setText(QApplication::translate("SamplePlugin", "Move back from grasp", 0, QApplication::UnicodeUTF8));
-        label_2->setText(QApplication::translate("SamplePlugin", "yPos:", 0, QApplication::UnicodeUTF8));
         _btn4->setText(QApplication::translate("SamplePlugin", "Move to grasp pos", 0, QApplication::UnicodeUTF8));
+        label_2->setText(QApplication::translate("SamplePlugin", "yPos:", 0, QApplication::UnicodeUTF8));
         _btn2->setText(QApplication::translate("SamplePlugin", "Move to drop pos", 0, QApplication::UnicodeUTF8));
-        _btn3->setText(QApplication::translate("SamplePlugin", "Move to zero pos", 0, QApplication::UnicodeUTF8));
         _btn1->setText(QApplication::translate("SamplePlugin", "Move to img pos", 0, QApplication::UnicodeUTF8));
+        _btn3->setText(QApplication::translate("SamplePlugin", "Move to zero pos", 0, QApplication::UnicodeUTF8));
         _btn6->setText(QApplication::translate("SamplePlugin", "Close gripper", 0, QApplication::UnicodeUTF8));
+        _btn8->setText(QApplication::translate("SamplePlugin", "Look for bricks", 0, QApplication::UnicodeUTF8));
+        _btn9->setText(QApplication::translate("SamplePlugin", "Move to blue", 0, QApplication::UnicodeUTF8));
+        _btn10->setText(QApplication::translate("SamplePlugin", "Move to red", 0, QApplication::UnicodeUTF8));
+        _btn11->setText(QApplication::translate("SamplePlugin", "Move to yellow", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

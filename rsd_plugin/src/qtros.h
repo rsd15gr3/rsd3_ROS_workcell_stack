@@ -11,7 +11,7 @@
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
-#include "kuka_rsi/getConfiguration.h"
+#include "kuka_ros/getConfiguration.h"
 #include <QThread>
 #include <QObject>
 
@@ -33,7 +33,7 @@ class QtROS : public QThread {
     ///Triggered if ros::ok() != true
     void rosQuits();
     void newImage(cv::Mat);
-    void updateConfiguration(kuka_rsi::getConfiguration);
+    void updateConfiguration(kuka_ros::getConfiguration);
   private:
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     bool quitfromgui;
@@ -44,7 +44,7 @@ class QtROS : public QThread {
     image_transport::ImageTransport _it;
     image_transport::Subscriber _image_sub;
     ros::ServiceClient _q_client;
-    kuka_rsi::getConfiguration _q_srv;
+    kuka_ros::getConfiguration _q_srv;
 
 };
 #endif

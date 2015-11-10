@@ -6,7 +6,7 @@
 #include <QPushButton>
 #include <rw/kinematics.hpp>
 
-#include "kuka_rsi/setConfiguration.h" //set config
+#include "kuka_ros/setConfiguration.h" //set config
 #include "../../WSG50/wsg_50_common/srv_gen/cpp/include/wsg_50_common/Move.h"
 #include "brick_detection/bricks.h"
 #include "std_srvs/Empty.h"
@@ -81,8 +81,8 @@ rsdPluginPlugin::rsdPluginPlugin():
         
     qRegisterMetaType<cv::Mat>("cv::Mat");
         connect(_qtRos, SIGNAL(newImage(cv::Mat)), this, SLOT(newImage(cv::Mat)));
-    qRegisterMetaType<kuka_rsi::getConfiguration>("kuka_rsi::getConfiguration");
-        connect(_qtRos,SIGNAL(updateConfiguration(kuka_rsi::getConfiguration)), this, SLOT(updateConfiguration(kuka_rsi::getConfiguration)));
+    qRegisterMetaType<kuka_ros::getConfiguration>("kuka_ros::getConfiguration");
+        connect(_qtRos,SIGNAL(updateConfiguration(kuka_ros::getConfiguration)), this, SLOT(updateConfiguration(kuka_ros::getConfiguration)));
 
      _qtRos->start();
 }
@@ -142,7 +142,7 @@ void rsdPluginPlugin::newImage(cv::Mat image){
         if(image.rows > 0 and image.cols > 0)
 	{
         cv::Mat temp; // make the same cv::Mat
-        cvtColor(image, temp,CV_BGR2RGB); // cvtColor Makes a copt, that what i need
+        cv::cvtColor(image, temp,CV_BGR2RGB); // cvtColor Makes a copt, that what i need
         QImage dest((uchar*) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
         QImage dest2(dest);
         dest2.detach(); // enforce deep copy
@@ -154,7 +154,7 @@ void rsdPluginPlugin::newImage(cv::Mat image){
 	}
 }
 
-void rsdPluginPlugin::updateConfiguration(kuka_rsi::getConfiguration config){
+void rsdPluginPlugin::updateConfiguration(kuka_ros::getConfiguration config){
 
    Q qq = Q(6,config.response.q[0]*0.017453,config.response.q[1]*0.017453,config.response.q[2]*0.017453,
            config.response.q[3]*0.017453,config.response.q[4]*0.017453,config.response.q[5]*0.017453);
@@ -166,7 +166,7 @@ bool rsdPluginPlugin::SetConfiguration(Q _q) {
     if(_q.size() == 6)
     {
         log().info() << "Setting configuration: " << _q << "\n";
-        kuka_rsi::setConfiguration _q_srv;
+        kuka_ros::setConfiguration _q_srv;
         _q_srv.request.q[0] = _q[0];
         _q_srv.request.q[1] = _q[1];
         _q_srv.request.q[2] = _q[2];

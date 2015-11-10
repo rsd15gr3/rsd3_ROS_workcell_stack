@@ -1,7 +1,0 @@
-set(_CATKIN_CURRENT_PACKAGE "rsd_plugin")
-set(rsd_plugin_MAINTAINER "cortsen <sttur14@student.sdu.dk>")
-set(rsd_plugin_DEPRECATED "")
-set(rsd_plugin_VERSION "0.0.0")
-set(rsd_plugin_BUILD_DEPENDS "cv_bridge" "sensor_msgs" "rospy" "roscpp" "std_msgs" "image_transport" "std_srvs")
-set(rsd_plugin_RUN_DEPENDS "cv_bridge" "sensor_msgs" "roscpp" "rospy" "std_msgs" "image_transport" "std_srvs")
-set(rsd_plugin_BUILDTOOL_DEPENDS "catkin")
