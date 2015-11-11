@@ -29,7 +29,10 @@ Should be build with qt-creater! (using catkin_make can result in old versions o
 
 3. open project /src/rsd_plugin/CMakeLists.txt
 
-4. set the build folder to  /src/rsd_plugin-build
+4. set the build folder to  /src/rsd_plugin-build 
+
+(do not add new files generated in this folder to the git repository!, only commit changes in ui_rsdPlugin.h)
+hint: ui_rsdPlugin.h can be copyed to the rsd_plugint/src folder, if catkin_make generates errors.
 
 The newset plugin compiled by qtcreator will be located in /src/rsd_plugin-build/devel/lib
 
