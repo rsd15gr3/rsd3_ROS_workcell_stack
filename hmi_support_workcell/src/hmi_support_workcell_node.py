@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from std_msgs.msg import String
-from msgs.msg import BoolStamped
+from std_msgs.msg import String, Bool, Float32MultiArray
 
 
 class Node():
@@ -11,8 +10,8 @@ class Node():
         """ Node initialization """
 
         ''' Holding variables '''
-        self.current_kuka_configuration = None
-        self.wc_automode_msg = BoolStamped()
+        self.current_kuka_configuration = Float32MultiArray()
+        self.wc_automode_msg = Bool()
         self.wc_automode_msg.data = False
 
         ''' Topics names '''
@@ -30,7 +29,7 @@ class Node():
         self.update_rate = rospy.Rate(rospy.get_param('~update_rate', 20))  # Hz
 
         ''' Publishers '''
-        self.wc_automode_publisher = rospy.Publisher(self.wc_automode_topic_name, BoolStamped, queue_size=1)
+        self.wc_automode_publisher = rospy.Publisher(self.wc_automode_topic_name, Bool, queue_size=1)
 
         ''' Subscribers '''
         rospy.Subscriber(self.ui_str_control_wc_topic_name, String, self.on_ui_str_control_wc_topic)
@@ -42,9 +41,9 @@ class Node():
         if msg.data.startswith('wc_joint'):
             joint_ind = int(msg.data.split('_')[2][1])
             if msg.data.endswith('d'):
-                self.current_kuka_configuration[joint_ind] -= self.kuka_joints_steps[joint_ind]
+                self.current_kuka_configuration.data[joint_ind] -= self.kuka_joints_steps[joint_ind]
             elif msg.data.endswith('u'):
-                self.current_kuka_configuration[joint_ind] += self.kuka_joints_steps[joint_ind]
+                self.current_kuka_configuration.data[joint_ind] += self.kuka_joints_steps[joint_ind]
             self.forward_configuration()
         elif msg.data == 'wc_mode_auto':
             self.wc_automode_msg.data = True

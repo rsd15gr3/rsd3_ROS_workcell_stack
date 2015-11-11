@@ -4,8 +4,6 @@ project(hmi_support_workcell)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
-  geometry_msgs
-  msgs
   roslaunch
 )
 
