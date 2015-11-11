@@ -293,7 +293,7 @@ std::vector<brick> detectBrick(Mat src){
 	}
 	//-------------------------------
 	ROS_INFO("point 4");
-	for(int i = 0; i< green_lines.size(); i++){
+	for(int i = 0; i< blue_lines.size(); i++){
 		ROS_INFO("point 4 loop run : %d", i);
 		ROS_INFO("point 4 loop point 1");
 		ROS_INFO("vector size: %d",found.size());

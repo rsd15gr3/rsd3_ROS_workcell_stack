@@ -12,6 +12,8 @@
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include "kuka_ros/getConfiguration.h"
+#include "kuka_ros/setConfiguration.h"
+#include <std_msgs/Bool.h>
 #include <QThread>
 #include <QObject>
 
@@ -28,14 +30,19 @@ class QtROS : public QThread {
     void run();
   public slots:
     ///Connect to aboutToQuit signals, to stop the thread
+    void setConfigurationAuto(kuka_ros::setConfiguration _q_srv); //signal from auto
     void quitNow();
   signals:
     ///Triggered if ros::ok() != true
     void rosQuits();
+    void manualControl_req(bool); //requst for manual control
     void newImage(cv::Mat);
     void updateConfiguration(kuka_ros::getConfiguration);
   private:
+    bool manualControl = false;
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
+    void manualControlCallback(const std_msgs::Bool::ConstPtr& msg);
+    bool setConfigurationCallback(kuka_ros::setConfiguration::Request &req, kuka_ros::setConfiguration::Response &res);
     bool quitfromgui;
     void process();
     sensor_msgs::ImageConstPtr _imageIn;
@@ -43,7 +50,9 @@ class QtROS : public QThread {
     ros::NodeHandle _nh;
     image_transport::ImageTransport _it;
     image_transport::Subscriber _image_sub;
+    ros::Subscriber manualControl_sub;
     ros::ServiceClient _q_client;
+    ros::ServiceServer setConfigurationService;
     kuka_ros::getConfiguration _q_srv;
 
 };

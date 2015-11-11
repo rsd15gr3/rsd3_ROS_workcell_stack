@@ -9,8 +9,9 @@
 QtROS::QtROS(): _it(_nh) {
   ROS_INFO("Connected to roscore");
   _image_sub = _it.subscribe(SUBSCRIBER, 1, &QtROS::imageCallback, this);
-
-  //_q_client = _nh.serviceClient<kuka_ros::getConfiguration>("/GetConfiguration");
+   setConfigurationService = _nh.advertiseService("/rsdPlugin/SetConfiguration", &QtROS::setConfigurationCallback, this);
+   manualControl_sub = _nh.subscribe("/UI/ManualControl", 1, &QtROS::manualControlCallback, this);
+   //_q_client = _nh.serviceClient<kuka_ros::getConfiguration>("/GetConfiguration");
   quitfromgui = false; }
 
 void QtROS::quitNow(){ 
@@ -28,6 +29,39 @@ void QtROS::imageCallback(const sensor_msgs::ImageConstPtr& msg)
          ROS_ERROR("cv_bridge exception: %s", e.what());
          return; 
 }
+}
+
+void QtROS::manualControlCallback(const std_msgs::Bool::ConstPtr& msg)
+{
+    if(manualControl != msg->data)
+    {
+        manualControl = msg->data;
+        emit manualControl_req(msg->data); //requst statemachine for manual control
+    }
+}
+
+void QtROS::setConfigurationAuto(kuka_ros::setConfiguration _q_srv)
+{
+    if(!manualControl)
+        ros::service::call("/KukaNode/SetConfiguration",_q_srv);
+    else
+        ROS_ERROR("Ignoring configuration! (system is on auto!)");
+}
+
+bool QtROS::setConfigurationCallback(kuka_ros::setConfiguration::Request &req, kuka_ros::setConfiguration::Response &res)
+{
+    if(manualControl)
+    {
+        kuka_ros::setConfiguration _UI_srv;
+        _UI_srv.request = req;
+        ros::service::call("/KukaNode/SetConfiguration",_UI_srv);
+        return true;
+    }
+    else
+    {
+        ROS_ERROR("Ignoring configuration! (system is on auto!)");
+        return false;
+    }
 }
 
 void QtROS::process()

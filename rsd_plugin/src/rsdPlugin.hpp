@@ -50,6 +50,7 @@ private slots:
     void updateConfiguration(kuka_ros::getConfiguration);
 
 signals:
+    void setConfigurationAuto(kuka_ros::setConfiguration _q_srv);
 	void quitNow();
 
 private:

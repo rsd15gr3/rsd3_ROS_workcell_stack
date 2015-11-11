@@ -78,11 +78,15 @@ rsdPluginPlugin::rsdPluginPlugin():
     _qtRos = new QtROS();
 
     connect(this, SIGNAL(quitNow()), _qtRos, SLOT(quitNow()));
-        
+
+    qRegisterMetaType<kuka_ros::setConfiguration>("kuka_ros::setConfiguration");
+    connect(this, SIGNAL(setConfigurationAuto(kuka_ros::setConfiguration)),_qtRos, SLOT(setConfigurationAuto(kuka_ros::setConfiguration)));
+
     qRegisterMetaType<cv::Mat>("cv::Mat");
-        connect(_qtRos, SIGNAL(newImage(cv::Mat)), this, SLOT(newImage(cv::Mat)));
+    connect(_qtRos, SIGNAL(newImage(cv::Mat)), this, SLOT(newImage(cv::Mat)));
+
     qRegisterMetaType<kuka_ros::getConfiguration>("kuka_ros::getConfiguration");
-        connect(_qtRos,SIGNAL(updateConfiguration(kuka_ros::getConfiguration)), this, SLOT(updateConfiguration(kuka_ros::getConfiguration)));
+    connect(_qtRos,SIGNAL(updateConfiguration(kuka_ros::getConfiguration)), this, SLOT(updateConfiguration(kuka_ros::getConfiguration)));
 
      _qtRos->start();
 }
@@ -173,7 +177,8 @@ bool rsdPluginPlugin::SetConfiguration(Q _q) {
         _q_srv.request.q[3] = _q[3];
         _q_srv.request.q[4] = _q[4];
         _q_srv.request.q[5] = _q[5];
-        ros::service::call("/KukaNode/SetConfiguration",_q_srv);
+        emit setConfigurationAuto(_q_srv);
+        //ros::service::call("/KukaNode/SetConfiguration",_q_srv);
         return true;
     }
     else
