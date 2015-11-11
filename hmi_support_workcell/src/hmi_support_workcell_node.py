@@ -10,7 +10,7 @@ class Node():
         """ Node initialization """
 
         ''' Holding variables '''
-        self.current_kuka_configuration = Float32MultiArray()
+        self.current_kuka_configuration = None
         self.wc_automode_msg = Bool()
         self.wc_automode_msg.data = False
 
@@ -20,9 +20,9 @@ class Node():
 
         ''' Services names and types '''
         self.manual_conf_service_name = rospy.get_param('~manual_conf_service_name', '/rsdPlugin/SetConfiguration')
-        self.manual_conf_service_type = rospy.get_param('~manual_conf_service_type', '/kuka_ros/setConfiguration.srv')
+        self.manual_conf_service_type = rospy.get_param('~manual_conf_service_type', 'kuka_ros/setConfiguration')
         self.get_conf_service_name = rospy.get_param('~get_conf_service_name', '/KukaNode/GetConfiguration')
-        self.get_conf_service_type = rospy.get_param('~get_conf_service_type', '/kuka_ros/getConfiguration.srv')
+        self.get_conf_service_type = rospy.get_param('~get_conf_service_type', 'kuka_ros/getConfiguration')
 
         ''' Other Parameters '''
         self.kuka_joints_steps = rospy.get_param('~kuka_joints_steps', [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1])
@@ -41,10 +41,10 @@ class Node():
         if msg.data.startswith('wc_joint'):
             joint_ind = int(msg.data.split('_')[2][1])
             if msg.data.endswith('d'):
-                self.current_kuka_configuration.data[joint_ind] -= self.kuka_joints_steps[joint_ind]
+                self.current_kuka_configuration.q[joint_ind] -= self.kuka_joints_steps[joint_ind]
             elif msg.data.endswith('u'):
-                self.current_kuka_configuration.data[joint_ind] += self.kuka_joints_steps[joint_ind]
-            self.forward_configuration()
+                self.current_kuka_configuration.q[joint_ind] += self.kuka_joints_steps[joint_ind]
+            self.suggest_configuration()
         elif msg.data == 'wc_mode_auto':
             self.wc_automode_msg.data = True
             self.publish_automode_message()     # TODO : publish wc_automode 'all the time' or only when changed?
@@ -62,7 +62,7 @@ class Node():
         except rospy.ServiceException:
             print 'Service call (get_configuration) failed.'
 
-    def forward_configuration(self):
+    def suggest_configuration(self):
         rospy.wait_for_service(self.manual_conf_service_name)
         try:
             service = rospy.ServiceProxy(self.manual_conf_service_name, self.manual_conf_service_type)

@@ -8,9 +8,9 @@
 		
 		<!-- Services parameters -->
 		<param name="manual_conf_service_name" value="/rsdPlugin/SetConfiguration" />
-		<param name="manual_conf_service_type" value="/kuka_ros/setConfiguration.srv" />
+		<param name="manual_conf_service_type" value="kuka_ros/setConfiguration" />
 		<param name="get_conf_service_name" value="/KukaNode/GetConfiguration" />
-		<param name="get_conf_service_type" value="/kuka_ros/getConfiguration.srv" />
+		<param name="get_conf_service_type" value="kuka_ros/getConfiguration" />
 		
 		<!-- Other parameters -->
 		<param name="kuka_joints_steps" value="[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]" />
