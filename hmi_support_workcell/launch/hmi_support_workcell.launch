@@ -1,0 +1,20 @@
+<!-- FroboScout launch file -->
+
+<launch>
+	<node pkg="hmi_support_workcell" name="hmi_support_workcell_node" type="hmi_support_workcell_node.py" output="screen">
+		<!-- Topics parameters -->
+		<param name="ui_str_control_wc_sub" value="/ui_str_control_wc" />
+		<param name="wc_automode_pub" value="/wc_automode" />
+		
+		<!-- Services parameters -->
+		<param name="manual_conf_service_name" value="/rsdPlugin/SetConfiguration" />
+		<param name="manual_conf_service_type" value="/kuka_ros/setConfiguration.srv" />
+		<param name="get_conf_service_name" value="/KukaNode/GetConfiguration" />
+		<param name="get_conf_service_type" value="/kuka_ros/getConfiguration.srv" />
+		
+		<!-- Other parameters -->
+		<param name="kuka_joints_steps" value="[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]" />
+		<param name="update_rate" value="20" />
+	</node>
+</launch>
+
