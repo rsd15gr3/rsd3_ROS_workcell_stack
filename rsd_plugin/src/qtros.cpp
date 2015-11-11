@@ -25,24 +25,24 @@ void QtROS::imageCallback(const sensor_msgs::ImageConstPtr& msg)
      emit newImage(_imageOut->image);
   }
   catch(cv_bridge::Exception& e)
-{
+  {
          ROS_ERROR("cv_bridge exception: %s", e.what());
          return; 
-}
+  }
 }
 
 void QtROS::manualControlCallback(const std_msgs::Bool::ConstPtr& msg)
 {
-    if(manualControl != msg->data)
+    if(autoControlEnabled != msg->data)
     {
-        manualControl = msg->data;
-        emit manualControl_req(msg->data); //requst statemachine for manual control
+        autoControlEnabled = msg->data;
+        emit autoControlEnabledSignal(!autoControlEnabled); //requst statemachine for manual control
     }
 }
 
 void QtROS::setConfigurationAuto(kuka_ros::setConfiguration _q_srv)
 {
-    if(!manualControl)
+    if(autoControlEnabled)
         ros::service::call("/KukaNode/SetConfiguration",_q_srv);
     else
         ROS_ERROR("Ignoring configuration! (system is on auto!)");
@@ -50,7 +50,7 @@ void QtROS::setConfigurationAuto(kuka_ros::setConfiguration _q_srv)
 
 bool QtROS::setConfigurationCallback(kuka_ros::setConfiguration::Request &req, kuka_ros::setConfiguration::Response &res)
 {
-    if(manualControl)
+    if(!autoControlEnabled)
     {
         kuka_ros::setConfiguration _UI_srv;
         _UI_srv.request = req;
@@ -75,7 +75,6 @@ void QtROS::run(){
 
     if (ros::service::call("/KukaNode/GetConfiguration",_q_srv))
                emit updateConfiguration(_q_srv);
-
     
     ros::Duration(1./10.).sleep();
     }

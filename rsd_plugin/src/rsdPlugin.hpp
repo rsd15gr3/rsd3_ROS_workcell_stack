@@ -48,6 +48,7 @@ private slots:
 	void stateChangedListener(const rw::kinematics::State& state);
     void newImage(cv::Mat);
     void updateConfiguration(kuka_ros::getConfiguration);
+    void autoControlEnabled(bool);
 
 signals:
     void setConfigurationAuto(kuka_ros::setConfiguration _q_srv);

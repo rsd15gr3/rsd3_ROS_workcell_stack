@@ -79,6 +79,8 @@ rsdPluginPlugin::rsdPluginPlugin():
 
     connect(this, SIGNAL(quitNow()), _qtRos, SLOT(quitNow()));
 
+    connect(_qtRos,SIGNAL(autoControlEnabledSignal(bool)),this,SLOT(autoControlEnabled(bool)));
+
     qRegisterMetaType<kuka_ros::setConfiguration>("kuka_ros::setConfiguration");
     connect(this, SIGNAL(setConfigurationAuto(kuka_ros::setConfiguration)),_qtRos, SLOT(setConfigurationAuto(kuka_ros::setConfiguration)));
 
@@ -95,6 +97,9 @@ rsdPluginPlugin::~rsdPluginPlugin()
 {
 }
 
+void rsdPluginPlugin::autoControlEnabled(bool _autoenabled){
+    log().info() << "automode enabled: " << _autoenabled << "\n";
+}
 
 std::vector<brick> rsdPluginPlugin::getBricks()
 {

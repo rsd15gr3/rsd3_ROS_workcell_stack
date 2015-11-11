@@ -35,11 +35,11 @@ class QtROS : public QThread {
   signals:
     ///Triggered if ros::ok() != true
     void rosQuits();
-    void manualControl_req(bool); //requst for manual control
+    void autoControlEnabledSignal(bool); //requst for manual control
     void newImage(cv::Mat);
     void updateConfiguration(kuka_ros::getConfiguration);
   private:
-    bool manualControl = false;
+    bool autoControlEnabled = false;
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     void manualControlCallback(const std_msgs::Bool::ConstPtr& msg);
     bool setConfigurationCallback(kuka_ros::setConfiguration::Request &req, kuka_ros::setConfiguration::Response &res);
