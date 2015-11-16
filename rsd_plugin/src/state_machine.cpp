@@ -1,8 +1,6 @@
 #include "state_machine.h"
 #include <math.h>
 
-#define SUBSCRIBER "/usb_cam/image_raw"
-
 state_machine::state_machine() {
   ROS_INFO("Connected to roscore");
 

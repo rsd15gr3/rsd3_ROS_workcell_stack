@@ -76,6 +76,7 @@ rsdPluginPlugin::rsdPluginPlugin():
     connect(_btn11    ,SIGNAL(pressed()), this, SLOT(btnPressed()) );
 
     _qtRos = new QtROS();
+    _state_machine = new state_machine();
 
     connect(this, SIGNAL(quitNow()), _qtRos, SLOT(quitNow()));
 
@@ -89,6 +90,8 @@ rsdPluginPlugin::rsdPluginPlugin():
 
     qRegisterMetaType<kuka_ros::getConfiguration>("kuka_ros::getConfiguration");
     connect(_qtRos,SIGNAL(updateConfiguration(kuka_ros::getConfiguration)), this, SLOT(updateConfiguration(kuka_ros::getConfiguration)));
+
+    connect(this, SIGNAL(quitNow()), _state_machine, SLOT(quitNow()));
 
      _qtRos->start();
 }
@@ -223,6 +226,7 @@ void rsdPluginPlugin::btnPressed() {
 	if(obj==_btn0){
         log().info() << "Button 0 pressed ()\n";
         this->TestButtonsEnabled(false); //disable test buttons and start statemachine
+        _state_machine->start(); //start the statemachine
     } else if(obj==_btn1){
         log().info() << "Button 1 pressed (go to ImgCapture pos)\n";
         this->SetConfiguration(ConfigImgCapture);

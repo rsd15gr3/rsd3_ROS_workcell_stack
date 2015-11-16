@@ -87,6 +87,7 @@ private:
     std::vector<Q> calulatePickupPath(Transform3D<> start, double m_length = 0.05);
 	QTimer* _timer;
     QtROS *_qtRos;
+    state_machine _state_machine;
 	rw::models::WorkCell::Ptr _wc;
 	rw::kinematics::State _state;
 	Device::Ptr _device;
