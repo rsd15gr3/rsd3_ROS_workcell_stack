@@ -94,6 +94,7 @@ rsdPluginPlugin::rsdPluginPlugin():
     connect(this, SIGNAL(quitNow()), _state_machine, SLOT(quitNow()));
 
      _qtRos->start();
+     _state_machine->start();
 }
 
 rsdPluginPlugin::~rsdPluginPlugin()
@@ -226,16 +227,16 @@ void rsdPluginPlugin::btnPressed() {
 	if(obj==_btn0){
         log().info() << "Button 0 pressed ()\n";
         this->TestButtonsEnabled(false); //disable test buttons and start statemachine
-        _state_machine->start(); //start the statemachine
+        _state_machine->SetIdle(false); //start the statemachine
     } else if(obj==_btn1){
         log().info() << "Button 1 pressed (go to ImgCapture pos)\n";
-        this->SetConfiguration(ConfigImgCapture);
+        this->moveToImgCapture();
     } else if(obj==_btn2){
         log().info() << "Button 2 pressed (go to Dropoff pos)\n";
         this->SetConfiguration(ConfigDropoff);
     } else if(obj==_btn3){
         log().info() << "Button 3 pressed(go to zero pos)\n";
-        this->SetConfiguration(ConfigInit);
+        this->moveToInit();
     } else if(obj==_btn4){
         log().info() << "Button 4 pressed (move to brick)\n";
         this->moveToBrick(_xPosdoubleSpinBox->value(),_yPosdoubleSpinBox->value(),_yRotdoubleSpinBox->value());
@@ -261,6 +262,10 @@ void rsdPluginPlugin::btnPressed() {
         log().info() << "Button 8 pressed (move to yellow bricks)\n";
         this->moveToBrickColor(1);
     }
+}
+
+void rsdPluginPlugin::moveToInit(){
+    this->SetConfiguration(ConfigInit);
 }
 
 void rsdPluginPlugin::moveToImgCapture(){

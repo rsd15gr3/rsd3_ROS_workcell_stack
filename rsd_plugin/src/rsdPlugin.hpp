@@ -43,7 +43,7 @@ public:
 	virtual void close();
 	virtual void initialize();
 
-private slots:
+public slots:
     //UI stuff
 	void btnPressed();
     void timer(); //TODO: Remove the timer
@@ -57,6 +57,7 @@ private slots:
     //statemachine signals
     void moveToImgCapture();
     void moveToDropoff();
+    void moveToInit();
     bool backOffBrick();
     bool openGripper();
     bool closeGripper(bool BrickOnSide = false, double speedPct = 100);
@@ -87,7 +88,7 @@ private:
     std::vector<Q> calulatePickupPath(Transform3D<> start, double m_length = 0.05);
 	QTimer* _timer;
     QtROS *_qtRos;
-    state_machine _state_machine;
+    state_machine *_state_machine;
 	rw::models::WorkCell::Ptr _wc;
 	rw::kinematics::State _state;
 	Device::Ptr _device;

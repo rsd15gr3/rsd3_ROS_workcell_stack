@@ -12,19 +12,37 @@
 #include <std_msgs/Bool.h>
 #include <QThread>
 #include <QObject>
+#include <mutex>
+
+using namespace std;
 
 class state_machine : public QThread {
   Q_OBJECT
 
-  public:
-    state_machine();
-    void run();
-  public slots:
-    void quitNow();
+    public:
+        state_machine();
+        void run();
+        void SetIdle(bool idle);
+        bool GetIdle();
 
 
-  private:
-	bool quitfromgui;
+    signals:
+        void moveToImgCapture();
+        void moveToDropoff();
+        void moveToInit();
+        bool backOffBrick();
+        bool openGripper();
+        bool closeGripper(bool BrickOnSide = false, double speedPct = 100);
+
+    public slots:
+        void autoControlEnabled(bool);
+        void quitNow();
+
+    private:
+        bool timeout;
+        bool idle;
+        mutex idleMutex;
+        bool quitfromgui;
 
 };
 #endif
