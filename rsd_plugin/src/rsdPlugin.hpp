@@ -1,7 +1,5 @@
 #ifndef SAMPLEPLUGIN_HPP
 #define SAMPLEPLUGIN_HPP
-#include "../../rsd_plugin-build/ui_rsdPlugin.h"
-#include "qtros.h"
 #include <ros/ros.h>
 #include <opencv2/opencv.hpp>
 #include <sensor_msgs/Image.h>
@@ -9,12 +7,15 @@
 #include <rw/rw.hpp>
 #include <rw/models/Device.hpp>
 #include <rws/RobWorkStudioPlugin.hpp>
-
 #include <rw/rw.hpp>
 #include <rw/math/Q.hpp>
 #include <rw/loaders/WorkCellLoader.hpp>
 #include <rw/models/WorkCell.hpp>
 #include <rw/models/Device.hpp>
+
+#include "../../rsd_plugin-build/ui_rsdPlugin.h"
+#include "qtros.h"
+#include "state_machine.h"
 
 #include "kuka_ros/setConfiguration.h"
 
@@ -43,30 +44,45 @@ public:
 	virtual void initialize();
 
 private slots:
+    //UI stuff
 	void btnPressed();
-	void timer();
+    void timer(); //TODO: Remove the timer
 	void stateChangedListener(const rw::kinematics::State& state);
     void newImage(cv::Mat);
     void updateConfiguration(kuka_ros::getConfiguration);
+
+
     void autoControlEnabled(bool);
+    void TestButtonsEnabled(bool _b);
+    //statemachine signals
+    void moveToImgCapture();
+    void moveToDropoff();
+    bool backOffBrick();
+    bool openGripper();
+    bool closeGripper(bool BrickOnSide = false, double speedPct = 100);
+
+
 
 signals:
     void setConfigurationAuto(kuka_ros::setConfiguration _q_srv);
 	void quitNow();
 
 private:
-    void TestButtonsEnabled(bool _b);
+    //void TestButtonsEnabled(bool _b);
+    //bool closeGripper(bool BrickOnSide = false, double speedPct = 100);
+    //void moveToImgCapture();
+    //bool openGripper();
+    //bool backOffBrick();
+    //void moveToDropoff();
 	static cv::Mat toOpenCVImage(const rw::sensor::Image& img);
+
     bool SetConfiguration(Q _q);
+
     bool checkQcontraints(Q _q);
-    void moveToImgCapture();
     bool moveToBrickColor(int color);
-    bool moveToBrick(double xPos = 0.0, double yPos = 0.0, double yRot = 0.0);
-    bool closeGripper(bool BrickOnSide = false, double speedPct = 100);
-    bool openGripper();
+    bool moveToBrick(double xPos = 0.0, double yPos = 0.0, double yRot = 0.0);    
+
     std::vector<brick> getBricks();
-    bool backOffBrick();
-    void moveToDropoff();
     std::vector<Q> JacobianIKSover_50trys_Contrainted(Transform3D<> target);
     std::vector<Q> calulatePickupPath(Transform3D<> start, double m_length = 0.05);
 	QTimer* _timer;

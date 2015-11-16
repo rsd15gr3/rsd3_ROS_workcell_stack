@@ -122,6 +122,7 @@ OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 set(SrcFiles
 	src/rsdPlugin.cpp
         src/qtros.cpp
+	src/state_machine.cpp
 	${UIS_OUT_H}
 )
 
