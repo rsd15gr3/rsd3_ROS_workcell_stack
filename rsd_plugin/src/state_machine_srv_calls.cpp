@@ -11,24 +11,24 @@ bool state_machine_srv_calls::openGripper()
     {
       if(srv.response.error > 0) {
           //error from gripper... try ack and move again
-          log().info() << "Gripper error: " << (int)srv.response.error << "\n" <<
-                          "Acknowledgeing and trying to open the gripper again..." << "\n";
+          /*log().info() << "Gripper error: " << (int)srv.response.error << "\n" <<
+                          "Acknowledgeing and trying to open the gripper again..." << "\n";*/
           std_srvs::Empty AckSrv;
           ros::service::call("/wsg_50/ack",AckSrv);
           if (ros::service::call("/wsg_50/move",srv))
           {
               if(srv.response.error > 0) {
-                  log().info() << "Gripper error: " << (int)srv.response.error << "\n";
+                  //log().info() << "Gripper error: " << (int)srv.response.error << "\n";
                   return false;
               }
               else {
-                   log().info() << "Gripper moved to width = " << (int)srv.request.width << " at speed=" << (int)srv.request.speed << "\n";
+                   //log().info() << "Gripper moved to width = " << (int)srv.request.width << " at speed=" << (int)srv.request.speed << "\n";
                    return true;
               }
           }
           return false;
       } else {
-         log().info() << "Gripper open" << "\n";
+      //   log().info() << "Gripper open" << "\n";
       }
    }
     else
@@ -52,24 +52,24 @@ bool state_machine_srv_calls::closeGripper(bool BrickOnSide, double speedPct)
     {
       if(srv.response.error > 0) {
           //error from gripper... try ack and move again
-          log().info() << "Gripper error: " << (int)srv.response.error << "\n" <<
-                          "Acknowledgeing and trying to close the gripper again..." << "\n";
+       //   log().info() << "Gripper error: " << (int)srv.response.error << "\n" <<
+       //                   "Acknowledgeing and trying to close the gripper again..." << "\n";
           std_srvs::Empty AckSrv;
           ros::service::call("/wsg_50/ack",AckSrv);
           if (ros::service::call("/wsg_50/move",srv))
           {
               if(srv.response.error > 0) {
-                  log().info() << "Gripper error: " << (int)srv.response.error << "\n";
+        //          log().info() << "Gripper error: " << (int)srv.response.error << "\n";
                   return false;
               }
               else {
-                   log().info() << "Gripper moved to width = " << (int)srv.request.width << " at speed=" << (int)srv.request.speed << "\n";
+         //          log().info() << "Gripper moved to width = " << (int)srv.request.width << " at speed=" << (int)srv.request.speed << "\n";
                    return true;
               }
           }
           return false;
       } else {
-           log().info() << "Gripper moved to width = " << (int)srv.request.width << " at speed=" << (int)srv.request.speed << "\n";
+      //     log().info() << "Gripper moved to width = " << (int)srv.request.width << " at speed=" << (int)srv.request.speed << "\n";
            return true;
       }
    }
@@ -97,6 +97,11 @@ bool state_machine_srv_calls::brickPresent(int color)
 
 bool state_machine_srv_calls::robotMoving()
 {
-    return true;
+    kuka_ros::getIsMoving _isMoving_srv;
+    ros::service::call("/KukaNode/IsMoving",_isMoving_srv);
+    if(_isMoving_srv.response.isMoving)
+        return true;
+    else
+        return false;
 }
 

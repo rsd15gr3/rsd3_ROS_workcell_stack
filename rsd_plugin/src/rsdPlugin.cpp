@@ -93,6 +93,12 @@ rsdPluginPlugin::rsdPluginPlugin():
 
     connect(this, SIGNAL(quitNow()), _state_machine, SLOT(quitNow()));
 
+    connect(_state_machine,SIGNAL(moveToImgCapture()),this,SLOT(moveToImgCapture()));
+    connect(_state_machine,SIGNAL(moveToInit()),this,SLOT(moveToInit()));
+    connect(_state_machine,SIGNAL(moveToDropoff()),this,SLOT(moveToDropoff()));
+    connect(_state_machine,SIGNAL(moveToBrick(int)),this,SLOT(moveToBrickColor(int)));
+    connect(_state_machine,SIGNAL(backOffBrick()),this,SLOT(backOffBrick()));
+
      _qtRos->start();
      _state_machine->start();
 }

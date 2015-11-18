@@ -11,6 +11,7 @@
 #include <QThread>
 #include <QObject>
 #include <QMessageBox>
+#include <QTimer>
 #include <mutex>
 #include "state_machine_srv_calls.h"
 
@@ -32,12 +33,11 @@ class state_machine : public QThread {
         void moveToInit();
         void moveToBrick(int color);
         bool backOffBrick();
-        bool openGripper();
-        bool closeGripper(bool BrickOnSide = false, double speedPct = 100);
 
     public slots:
         void autoControlEnabled(bool);
         void quitNow();
+        void gripperTimeslot();
 
     private:
         bool timeout;
@@ -48,6 +48,8 @@ class state_machine : public QThread {
         int old_state;
         int position;
         state_machine_srv_calls srv_call;
+        QTimer *timer;
+        QMessageBox msgBox;
 
 };
 #endif

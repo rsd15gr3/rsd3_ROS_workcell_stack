@@ -30,6 +30,13 @@ state_machine::state_machine() {
   state = IDLE;
   old_state = IDLE;
   position = INIT;
+  timer = new QTimer(this);
+  timer->setSingleShot(true);
+  connect(timer, SIGNAL(timeout()), this, SLOT(gripperTimeslot()));
+  msgBox.setText("ERROR! The system has incountered an error");
+  msgBox.setInformativeText("Press ok to reset the system");
+  msgBox.setStandardButtons(QMessageBox::Ok);
+
 }
 
 void state_machine::SetIdle(bool _idle){
@@ -39,6 +46,10 @@ void state_machine::SetIdle(bool _idle){
     this->idle = _idle;
     idleMutex.unlock();
 
+}
+
+void state_machine::gripperTimeslot(){
+    timeout = true;
 }
 
 void state_machine::quitNow(){
@@ -66,17 +77,20 @@ void state_machine::run(){
       switch(state){
               case IDLE:
                   ROS_DEBUG_STREAM("IDLE");
+                  cout << "IDLE" << endl;
                   timeout = false;
                   idleMutex.lock();
                   if(!idle){
                       old_state = state;
                       state = READY;
+                      position = INIT;
                   }
                   idleMutex.unlock();
                   break;
 
               case READY:
                   ROS_DEBUG_STREAM("READY");
+                  cout << "READY" << endl;
                   old_state = state;
                   state = MOVING;
                   position = CAMERA;
@@ -84,6 +98,7 @@ void state_machine::run(){
 
               case CAPTURING_IMAGE:
                   ROS_DEBUG_STREAM("CAPTURING_IMAGE");
+                  cout << "CAPTURING_IMAGE" << endl;
                   // Capture video until desired bricks are seen in the image.
                   if(srv_call.brickPresent(0)){ ///<<---0 is the index for the brick color
                       old_state = state;
@@ -93,8 +108,8 @@ void state_machine::run(){
 
               case CHECK_BRICKS:
                   ROS_DEBUG_STREAM("CHECK_BRICKS");
+                  cout << "CHECK_BRICKS" << endl;
                   // Get brick positions
-                  //emit?? or call srv by it self?
                   if( srv_call.brickPresent(0)/* There are bricks to be picked. */){///<<---0 is the index for the brick color
                       old_state = state;
                       state = MOVING;
@@ -110,13 +125,14 @@ void state_machine::run(){
                   ROS_DEBUG_STREAM("CLOSE_GRIP");
                   // Send close grip command.
                   srv_call.closeGripper();
-                  gripperTimer = //n.createTimer(ros::Duration(1.0), gripperTimeCallback);
+                  timer->start(1000);
                   old_state = state;
                   state = GRIP_CLOSED;
                   break;
 
               case GRIP_CLOSED:
                   ROS_DEBUG_STREAM("GRIP_CLOSED");
+                  cout << "GRIP_CLOSED" << endl;
                   if( timeout ){
                       timeout = false;
                       old_state = state;
@@ -127,6 +143,7 @@ void state_machine::run(){
 
               case CHECK_PICK:
                   ROS_DEBUG_STREAM("CHECK_PICK");
+                  cout << "CHECK_PICK" << endl;
                   // Capture image.
                   if( true /* There is a brick picked. */ ){ ///TODO: check if we have a brick grap
                       old_state = state;
@@ -141,15 +158,16 @@ void state_machine::run(){
 
               case OPEN_GRIP:
                   ROS_DEBUG_STREAM("OPEN_GRIP");
+                  cout << "OPEN_GRIP" << endl;
                   // Send open grip command.
                   srv_call.openGripper();
-                  gripperTimer = /* n.createTimer(ros::Duration(1.0), gripperTimeCallback); */
                   old_state = state;
                   state = GRIP_OPENED;
                   break;
 
               case GRIP_OPENED:
                   ROS_DEBUG_STREAM("GRIP_OPENED");
+                  cout << "GRIP_OPENED" << endl;
                   if( timeout ){
                       timeout = false;
                       old_state = state;
@@ -159,6 +177,7 @@ void state_machine::run(){
 
               case MOVING:
                   ROS_DEBUG_STREAM("MOVING to: " << position);
+                  cout << "MOVING" << endl;
                   if(!srv_call.robotMoving() ){ /* if(Not moving.) */
                       switch(position){
                           case INIT:
@@ -225,18 +244,14 @@ void state_machine::run(){
                   break;
 
               case ERROR:
-                  QMessageBox msgBox;
-                  msgBox.setText("ERROR! The system has incountered an error in state: " + to_string(state));
-                  msgBox.setInformativeText("Press ok to reset the system");
-                  msgBox.setStandardButtons(QMessageBox::Ok);
-                  int ret = msgBox.exec();
-                  if( ret == QMessageBox::Ok/* User acknowledge */ ){
+                  if( true/*msgBox.exec() == QMessageBox::Ok*//* User acknowledge */ ){
                       old_state = state;
                       state = READY;
                   }
                   break;
 
               default:
+                  cout << "default! ERROR!" << endl;
                   old_state = state;
                   state = ERROR;
                   break;

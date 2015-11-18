@@ -47,7 +47,7 @@ void QtROS::setConfigurationAuto(kuka_ros::setConfiguration _q_srv)
     if(autoControlEnabled)
         ros::service::call("/KukaNode/SetConfiguration",_q_srv);
     else
-        ROS_ERROR("Ignoring configuration! (system is on auto!)");
+        ROS_ERROR("Ignoring configuration! (system is on manual!)");
 }
 
 ///Set configuration callback for
@@ -67,8 +67,6 @@ bool QtROS::setConfigurationCallback(kuka_ros::setConfiguration::Request &req, k
         return false;
     }
 }
-
-
 
 void QtROS::run(){ 
   while(ros::ok() && !quitfromgui) {
