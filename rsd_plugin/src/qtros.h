@@ -44,7 +44,6 @@ class QtROS : public QThread {
     void manualControlCallback(const std_msgs::Bool::ConstPtr& msg);
     bool setConfigurationCallback(kuka_ros::setConfiguration::Request &req, kuka_ros::setConfiguration::Response &res);
     bool quitfromgui;
-    void process();
     sensor_msgs::ImageConstPtr _imageIn;
     cv_bridge::CvImagePtr _imageOut;
     ros::NodeHandle _nh;

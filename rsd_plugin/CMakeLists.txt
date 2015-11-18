@@ -108,7 +108,7 @@ SET(UIS_FILES src/rsdPlugin.ui )
 
 QT4_WRAP_UI(UIS_OUT_H ${UIS_FILES})
 
-QT4_WRAP_CPP(MocSrcFiles src/rsdPlugin.hpp src/qtros.h
+QT4_WRAP_CPP(MocSrcFiles src/rsdPlugin.hpp src/qtros.h src/state_machine.h src/state_machine_srv_calls.h
 OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 )
 # Rcc the files:
@@ -123,6 +123,7 @@ set(SrcFiles
 	src/rsdPlugin.cpp
         src/qtros.cpp
 	src/state_machine.cpp
+	src/state_machine_srv_calls.cpp
 	${UIS_OUT_H}
 )
 

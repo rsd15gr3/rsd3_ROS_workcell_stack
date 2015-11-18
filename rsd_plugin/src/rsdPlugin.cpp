@@ -152,7 +152,7 @@ void rsdPluginPlugin::TestButtonsEnabled(bool _b)
 
 void rsdPluginPlugin::newImage(cv::Mat image){
 
-        if(image.rows > 0 and image.cols > 0)
+    if(image.rows > 0 and image.cols > 0)
 	{
         cv::Mat temp; // make the same cv::Mat
         cv::cvtColor(image, temp,CV_BGR2RGB); // cvtColor Makes a copt, that what i need
@@ -187,7 +187,6 @@ bool rsdPluginPlugin::SetConfiguration(Q _q) {
         _q_srv.request.q[4] = _q[4];
         _q_srv.request.q[5] = _q[5];
         emit setConfigurationAuto(_q_srv);
-        //ros::service::call("/KukaNode/SetConfiguration",_q_srv);
         return true;
     }
     else
@@ -289,10 +288,7 @@ bool rsdPluginPlugin::moveToBrickColor(int color) {
         }
     }
     return false;
-
 }
-
-
 
                                  //xpos +-0.10 //ypos +-0.075(checked) // //yRos +- pi/2
 bool rsdPluginPlugin::moveToBrick(double xPos, double yPos,double yRot) {

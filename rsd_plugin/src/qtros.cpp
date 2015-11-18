@@ -40,16 +40,20 @@ void QtROS::manualControlCallback(const std_msgs::Bool::ConstPtr& msg)
     }
 }
 
+//Autonom movement
 void QtROS::setConfigurationAuto(kuka_ros::setConfiguration _q_srv)
 {
+    //check if autocontrol is enabled (if system is on manual, this callback must not move the robot)
     if(autoControlEnabled)
         ros::service::call("/KukaNode/SetConfiguration",_q_srv);
     else
         ROS_ERROR("Ignoring configuration! (system is on auto!)");
 }
 
+///Set configuration callback for
 bool QtROS::setConfigurationCallback(kuka_ros::setConfiguration::Request &req, kuka_ros::setConfiguration::Response &res)
 {
+    //check if autocontrol is enabled (if system is on auto, this callback must not move the robot)
     if(!autoControlEnabled)
     {
         kuka_ros::setConfiguration _UI_srv;
@@ -64,10 +68,7 @@ bool QtROS::setConfigurationCallback(kuka_ros::setConfiguration::Request &req, k
     }
 }
 
-void QtROS::process()
-{
-   //emit newImage(cv_ptr->image);
-}
+
 
 void QtROS::run(){ 
   while(ros::ok() && !quitfromgui) {

@@ -51,18 +51,16 @@ public slots:
     void newImage(cv::Mat);
     void updateConfiguration(kuka_ros::getConfiguration);
 
-
     void autoControlEnabled(bool);
     void TestButtonsEnabled(bool _b);
     //statemachine signals
     void moveToImgCapture();
+    bool moveToBrickColor(int color);
     void moveToDropoff();
     void moveToInit();
     bool backOffBrick();
     bool openGripper();
     bool closeGripper(bool BrickOnSide = false, double speedPct = 100);
-
-
 
 signals:
     void setConfigurationAuto(kuka_ros::setConfiguration _q_srv);
@@ -80,7 +78,7 @@ private:
     bool SetConfiguration(Q _q);
 
     bool checkQcontraints(Q _q);
-    bool moveToBrickColor(int color);
+
     bool moveToBrick(double xPos = 0.0, double yPos = 0.0, double yRot = 0.0);    
 
     std::vector<brick> getBricks();

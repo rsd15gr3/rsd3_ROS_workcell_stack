@@ -7,12 +7,13 @@
 #ifndef QT_state_machine_H
 #define QT_state_machine_H
 #include <ros/ros.h>
-#include "kuka_ros/getConfiguration.h"
-#include "kuka_ros/setConfiguration.h"
 #include <std_msgs/Bool.h>
 #include <QThread>
 #include <QObject>
+#include <QMessageBox>
 #include <mutex>
+#include "state_machine_srv_calls.h"
+
 
 using namespace std;
 
@@ -25,11 +26,11 @@ class state_machine : public QThread {
         void SetIdle(bool idle);
         bool GetIdle();
 
-
     signals:
         void moveToImgCapture();
         void moveToDropoff();
         void moveToInit();
+        void moveToBrick(int color);
         bool backOffBrick();
         bool openGripper();
         bool closeGripper(bool BrickOnSide = false, double speedPct = 100);
@@ -43,6 +44,10 @@ class state_machine : public QThread {
         bool idle;
         mutex idleMutex;
         bool quitfromgui;
+        int state;
+        int old_state;
+        int position;
+        state_machine_srv_calls srv_call;
 
 };
 #endif
