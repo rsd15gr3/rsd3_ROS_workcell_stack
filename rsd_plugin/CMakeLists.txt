@@ -12,16 +12,16 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   std_srvs
   image_transport
-#
+  kuka_ros
 )
 
 
 #add_service_files(
-#  FILES  
+#  FILES
 #)
 
 #add_message_files(
-#   FILES 
+#   FILES
 #
 #)
 
@@ -99,8 +99,8 @@ IF(NOT ROBWORKSTUDIO_FOUND)
   MESSAGE(STATUS "Could not find RobWorkStudio with the new method. Trying the old one.")
   INCLUDE(${RWSTUDIO_ROOT}/build/FindRobWorkStudio.cmake)
 ENDIF(NOT ROBWORKSTUDIO_FOUND)
-																												
-INCLUDE_DIRECTORIES( ${ROBWORK_INCLUDE_DIRS} ${ROBWORKSTUDIO_INCLUDE_DIRS} )																								
+
+INCLUDE_DIRECTORIES( ${ROBWORK_INCLUDE_DIRS} ${ROBWORKSTUDIO_INCLUDE_DIRS} )
 LINK_DIRECTORIES( ${ROBWORK_LIBRARY_DIRS} ${ROBWORKSTUDIO_LIBRARY_DIRS} ${catkin_LIBRARIES})
 
 # if we want to use ui files add them here
@@ -108,11 +108,11 @@ SET(UIS_FILES src/rsdPlugin.ui )
 
 QT4_WRAP_UI(UIS_OUT_H ${UIS_FILES})
 
-QT4_WRAP_CPP(MocSrcFiles 
-	src/rsdPlugin.hpp 
-	src/qtros.h 
-	src/state_machine.h 
-	src/state_machine_srv_calls.h 
+QT4_WRAP_CPP(MocSrcFiles
+	src/rsdPlugin.hpp
+	src/qtros.h
+	src/state_machine.h
+	src/state_machine_srv_calls.h
 OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 )
 # Rcc the files:
@@ -139,6 +139,7 @@ set(ROS_BUILD_SHARED_LIBS true)
 #target_link_libraries(RWSPlugin ${catkin_LIBRARIES})
 add_library(rsdPlugin ${SrcFiles} ${MocSrcFiles}  ${RccSrcFiles})
 target_link_libraries(rsdPlugin ${catkin_LIBRARIES})
+add_dependencies(rsdPlugin ${catkin_EXPORTED_TARGETS})
 #
 
 ## Declare a cpp library
