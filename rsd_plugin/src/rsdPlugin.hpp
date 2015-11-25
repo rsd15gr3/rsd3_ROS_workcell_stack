@@ -13,7 +13,7 @@
 #include <rw/models/WorkCell.hpp>
 #include <rw/models/Device.hpp>
 
-#include "../../rsd_plugin-build/ui_rsdPlugin.h"
+#include "ui_rsdPlugin.h"
 #include "qtros.h"
 #include "state_machine.h"
 
