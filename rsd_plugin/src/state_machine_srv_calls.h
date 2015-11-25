@@ -10,16 +10,82 @@
 #include <rw/rw.hpp>
 #include "std_srvs/Empty.h"
 #include "brick_detection/bricks.h"
+#include "Configurations.h"
+#include <rw/models/Device.hpp>
+#include <rw/rw.hpp>
+#include <rw/models/Device.hpp>
+#include <rw/rw.hpp>
+#include <rw/math/Q.hpp>
+#include <rw/models/WorkCell.hpp>
+#include <rw/models/Device.hpp>
+#include <rw/invkin/JacobianIKSolver.hpp>
+#include <rw/math/Transform3D.hpp>
+#include <rw/common.hpp>
+#include <rw/proximity/CollisionDetector.hpp>
+#include <rwlibs/proximitystrategies/ProximityStrategyFactory.hpp>
+#include <rw/pathplanning/PlannerUtil.hpp>
+#include <rwlibs/pathplanners/rrt/RRTPlanner.hpp>
+#include <rw/models/WorkCell.hpp>
+#include <rw/math/Transform3D.hpp>
+#include <rw/math.hpp>
+#include <rw/invkin/JacobianIKSolver.hpp>
+#include <QObject>
 
 using namespace std;
 using namespace rw;
+using namespace rw::common;
+using namespace rw::kinematics;
+using namespace rw::models;
+using namespace rw::invkin;
+
+using namespace rw::common;
+using namespace rw::graphics;
+using namespace rw::kinematics;
+using namespace rw::models;
+using namespace rw::sensor;
+
+using namespace rw::trajectory;
+using namespace rw::pathplanning;
+using namespace rw::proximity;
+using namespace rw::models;
+using namespace rw::math;
+using namespace rw::invkin;
+
+struct brick {
+    double x;
+    double y;
+    double angle;
+    int color;
+};
 
 class state_machine_srv_calls {
-    public:
+public:
+    state_machine_srv_calls();
+    state_machine_srv_calls(rw::models::WorkCell::Ptr _wc, rw::kinematics::State _state, Device::Ptr _device);
     bool openGripper();
     bool closeGripper(bool BrickOnSide = false, double speedPct = 100);
     bool brickPresent(int color);
     bool robotMoving();
+    bool closeToConfig();
+    bool moveTo(Q _q);
+    bool backOffBrick();
+    bool moveToBrickColor(int color);
+    std::vector<brick> getBricks();
+    bool moveToBrick(double xPos, double yPos,double yRot);
+
+private:
+    rw::models::WorkCell::Ptr wc;
+    rw::kinematics::State state;
+    Device::Ptr device;
+    std::vector<Q>  pickupPath;
+    bool checkQcontraints(Q q);
+    std::vector<Q> JacobianIKSover_50trys_Contrainted(Transform3D<> _target);
+    std::vector<Q> calulatePickupPath(Transform3D<> start, double m_length = 0.05);
+    Q lastSetQ;
+
+
+
+
 };
 #endif
 

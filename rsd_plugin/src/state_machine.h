@@ -14,7 +14,7 @@
 #include <QTimer>
 #include <mutex>
 #include "state_machine_srv_calls.h"
-
+#include "Configurations.h"
 
 using namespace std;
 
@@ -22,31 +22,29 @@ class state_machine : public QThread {
   Q_OBJECT
 
     public:
-        state_machine();
+        state_machine(rw::models::WorkCell::Ptr _wc, rw::kinematics::State _state, Device::Ptr _device);
         void run();
         void SetIdle(bool idle);
         bool GetIdle();
 
     signals:
-        void moveToImgCapture();
-        void moveToDropoff();
-        void moveToInit();
-        void moveToBrick(int color);
-        bool backOffBrick();
-
+        void Error();
     public slots:
         void autoControlEnabled(bool);
         void quitNow();
         void gripperTimeslot();
+        void ErrorAck();
 
     private:
         bool timeout;
         bool idle;
-        mutex idleMutex;
+        bool ErrorFlag;
         bool quitfromgui;
+        bool moving;
         int state;
         int old_state;
         int position;
+        mutex idleMutex;
         state_machine_srv_calls srv_call;
         QTimer *timer;
         QMessageBox msgBox;
