@@ -5,6 +5,7 @@
 #include "kuka_ros/getConfiguration.h"
 #include "kuka_ros/setConfiguration.h"
 #include "kuka_ros/getIsMoving.h"
+#include "brick_check/check_brick.h"
 #include <std_msgs/Bool.h>
 #include <QObject>
 #include <rw/rw.hpp>
@@ -72,6 +73,7 @@ public:
     bool moveToBrickColor(int color);
     std::vector<brick> getBricks();
     bool moveToBrick(double xPos, double yPos,double yRot);
+    bool checkPick();
 
 private:
     rw::models::WorkCell::Ptr wc;
@@ -82,6 +84,7 @@ private:
     std::vector<Q> JacobianIKSover_50trys_Contrainted(Transform3D<> _target);
     std::vector<Q> calulatePickupPath(Transform3D<> start, double m_length = 0.05);
     Q lastSetQ;
+    int lastPickBrickColor;
 
 
 

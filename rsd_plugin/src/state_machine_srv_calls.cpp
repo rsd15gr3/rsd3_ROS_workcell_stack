@@ -227,10 +227,10 @@ std::vector<Q> state_machine_srv_calls::calulatePickupPath(Transform3D<> start, 
 bool state_machine_srv_calls::moveToBrick(double xPos, double yPos,double yRot) {
     if(xPos > 0.101 || xPos < -0.101 || yPos > 0.0751 || yPos < -0.0751 || yRot > 1.581 || yRot < -1.581)
     {
-        //log().info() << "pickupBrick: xPos, yPos or yRot is breaking contraints!\n";
+        cout << "pickupBrick: xPos, yPos or yRot is breaking contraints!" << endl;
         return false;
     }
-
+    cout << "pickupBrick: x:" << to_string(xPos) << " y: " << to_string(yPos)  << endl;
     //get frames and calculate Robot->conveyotbelt trasformation
     Frame* conveyorbeltPickupCenter = wc->findFrame("conveyorBeltPickupCenter");
     Transform3D<> _conveyorbeltTopTransformation;
@@ -331,6 +331,7 @@ std::vector<brick> state_machine_srv_calls::getBricks()
 }
 
 bool state_machine_srv_calls::moveToBrickColor(int color) {
+    lastPickBrickColor = color;
     std::vector<brick> _bricks = this->getBricks();
 
     for(brick _brick : _bricks)
@@ -347,6 +348,21 @@ bool state_machine_srv_calls::moveToBrickColor(int color) {
         }
     }
     return false;
+}
+
+bool state_machine_srv_calls::checkPick(){
+    brick_check::check_brick _check_srv;
+    _check_srv.request.type = lastPickBrickColor;
+    if(ros::service::call("/brick_check_server/checkBrick", _check_srv))
+    {
+
+        return _check_srv.response.picked;
+    }
+    else
+    {
+        cout << "check brick: faild to call srv!" << endl;
+        return false;
+    }
 }
 
 bool state_machine_srv_calls::backOffBrick(){

@@ -3,6 +3,7 @@
 enum States{
     IDLE,
     READY,
+    START_BELT,
     CAPTURING_IMAGE,
     STOP_BELT,
     CHECK_BRICKS,
@@ -86,6 +87,13 @@ void state_machine::run(){
                   position = CAMERA;
                   break;
 
+              case START_BELT:
+                  cout << "START_BELT" << endl;
+                  //Start belt
+                  old_state = state;
+                  state = CAPTURING_IMAGE;
+                  break;
+
               case CAPTURING_IMAGE:
                   cout << "CAPTURING_IMAGE" << endl;
                   if(srv_call.brickPresent(0)){ ///<<---0 is the index for the brick color
@@ -96,6 +104,7 @@ void state_machine::run(){
 
               case STOP_BELT:
                   cout << "STOP_BELT" << endl;
+                  //Stop Belt
                   old_state = state;
                   state = CHECK_BRICKS;
                   break;
@@ -136,7 +145,7 @@ void state_machine::run(){
               case CHECK_PICK:
                   cout << "CHECK_PICK" << endl;
                   // Capture image.
-                  if( true /* There is a brick picked. */ ){ ///TODO: check if we have a brick grap
+                  if( srv_call.checkPick() ){ ///TODO: check if we have a brick grap
                       old_state = state;
                       state = MOVING;
                       position = DROP;
@@ -159,7 +168,7 @@ void state_machine::run(){
                   if( timeout ){
                       timeout = false;
                       old_state = state;
-                      state = CHECK_BRICKS;
+                      state = READY;
                   }
                   break;
 
@@ -209,7 +218,7 @@ void state_machine::run(){
                                     case READY:
                                         cout << "old_state: READY" << endl;
                                         old_state = state;
-                                        state = CAPTURING_IMAGE;
+                                        state = START_BELT;
                                         break;
 
                                     case CHECK_BRICKS:

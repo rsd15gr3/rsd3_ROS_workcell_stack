@@ -8,7 +8,7 @@ xterm -e roslaunch brick_detection brick_detection.launch &
 sleep 5s
 #Launch rest of the nodes in new terminals
 xterm -e roslaunch kuka_ros kukaros.launch &
-
+xterm -e rosrun brick_check brick_check_node &
 xterm -e roslaunch ../WSG50/launch/wsg_50_tcp.launch &
 #Wait a bit (let rest of the nodes start before we start RobWorkStudio)
 sleep 2s
