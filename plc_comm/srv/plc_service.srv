@@ -1,0 +1,5 @@
+bool action
+bool direction
+int16 preDefSpeed
+---
+bool activated
