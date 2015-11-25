@@ -5,7 +5,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED
-  OpenCV REQUIRED
   cv_bridge
   image_transport
   roscpp
@@ -13,6 +12,9 @@ find_package(catkin REQUIRED
   std_msgs
   message_generation
   genmsg)
+
+find_package(OpenCV REQUIRED)
+message(STATUS "Found OpenCV version ${OpenCV_VERSION}")
 
 add_service_files(
   FILES
@@ -40,5 +42,6 @@ add_dependencies(brick_detection_node ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(brick_detection_node
   ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
 )
 
