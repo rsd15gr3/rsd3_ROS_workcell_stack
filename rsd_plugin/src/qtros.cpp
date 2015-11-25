@@ -8,10 +8,9 @@
 
 QtROS::QtROS(): _it(_nh) {
   ROS_INFO("Connected to roscore");
-  _image_sub = _it.subscribe(SUBSCRIBER, 1, &QtROS::imageCallback, this);
+  //_image_sub = _it.subscribe(SUBSCRIBER, 1, &QtROS::imageCallback, this);
    setConfigurationService = _nh.advertiseService("/rsdPlugin/SetConfiguration", &QtROS::setConfigurationCallback, this);
    manualControl_sub = _nh.subscribe("/wc_automode", 1, &QtROS::manualControlCallback, this);
-   //_q_client = _nh.serviceClient<kuka_ros::getConfiguration>("/GetConfiguration");
   quitfromgui = false; }
 
 void QtROS::quitNow(){ 

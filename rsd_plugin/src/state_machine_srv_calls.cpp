@@ -2,6 +2,9 @@
 
 state_machine_srv_calls::state_machine_srv_calls(){
 
+ this->clientGetBricks = n.serviceClient<brick_detection::bricks>("brick_detector/getBricks",true);
+ this->clientConveyorBelt = n.serviceClient<plc_comm::plc_service>("operate_PLC",true);
+
 }
 
 state_machine_srv_calls::state_machine_srv_calls(rw::models::WorkCell::Ptr _wc, rw::kinematics::State _state, Device::Ptr _device){
@@ -87,7 +90,7 @@ bool state_machine_srv_calls::closeGripper(bool BrickOnSide, double speedPct)
 bool state_machine_srv_calls::brickPresent(int color)
 {
     brick_detection::bricks _brick_srv;
-    ros::service::call("/brick_detector/getBricks",_brick_srv);
+    clientGetBricks.call(_brick_srv);
     if(_brick_srv.response.x.size() > 0)
     {
         for(unsigned int i = 0; i !=_brick_srv.response.x.size(); i++)
@@ -381,4 +384,32 @@ bool state_machine_srv_calls::backOffBrick(){
         this->moveTo(Configurations::ConfigImgCapture);
         return true;
     }
+}
+
+bool state_machine_srv_calls::conveyorBelt(int speed, bool activate, bool forward){
+    //Speed 1: 50Hz, Speed 2: 35Hz
+    plc_comm::plc_service _srv;
+    _srv.request.action = activate;
+    _srv.request.direction = forward;
+    if(speed == 1 || speed == 2)
+    _srv.request.preDefSpeed = speed;
+    else
+        return false;
+
+    if(clientConveyorBelt.call(_srv))
+        return true;
+    else
+        cout << "ERROR!" << endl;
+        return false;
+}
+
+bool state_machine_srv_calls::conveyorBeltStop(){
+    plc_comm::plc_service _srv;
+    _srv.request.action = false;
+    _srv.request.direction = true;
+     _srv.request.preDefSpeed = 2;
+     if(clientConveyorBelt.call(_srv))
+         return true;
+     else
+         return false;
 }

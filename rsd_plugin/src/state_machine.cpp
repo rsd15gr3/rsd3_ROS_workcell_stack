@@ -73,7 +73,6 @@ void state_machine::ErrorAck(){
 
 void state_machine::run(){
   while(!quitfromgui) {
-      usleep(200000); //dont run the loop like a maniac
       switch(state)
       {
               case IDLE:
@@ -89,7 +88,7 @@ void state_machine::run(){
 
               case START_BELT:
                   cout << "START_BELT" << endl;
-                  //Start belt
+                  srv_call.conveyorBelt();
                   old_state = state;
                   state = CAPTURING_IMAGE;
                   break;
@@ -104,7 +103,7 @@ void state_machine::run(){
 
               case STOP_BELT:
                   cout << "STOP_BELT" << endl;
-                  //Stop Belt
+                  srv_call.conveyorBeltStop();
                   old_state = state;
                   state = CHECK_BRICKS;
                   break;
@@ -119,7 +118,7 @@ void state_machine::run(){
                   }
                   else{
                       old_state = state;
-                      state = CAPTURING_IMAGE;
+                      state = START_BELT;
                   }
                   break;
 
@@ -158,6 +157,7 @@ void state_machine::run(){
 
               case OPEN_GRIP:
                   cout << "OPEN_GRIP" << endl;
+                  timer->start(1000);
                   srv_call.openGripper();
                   old_state = state;
                   state = GRIP_OPENED;

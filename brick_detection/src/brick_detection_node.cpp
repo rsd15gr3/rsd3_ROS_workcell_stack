@@ -74,7 +74,10 @@ bool findBricks(brick_detection::bricks::Request  &req,
 
     mtx.unlock();
     ROS_INFO("returning true");
-    return true;
+    if(bricks.size()> 0)
+        return true;
+    else
+        return false;
 }
 
 int main(int argc, char** argv)

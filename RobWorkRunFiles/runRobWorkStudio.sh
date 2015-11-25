@@ -7,9 +7,10 @@ xterm -e roslaunch brick_detection brick_detection.launch &
 #Sleep a bit (Roscore need to start before we proceed)
 sleep 5s
 #Launch rest of the nodes in new terminals
-xterm -e roslaunch kuka_ros kukaros.launch &
-xterm -e rosrun brick_check brick_check_node &
-xterm -e roslaunch ../WSG50/launch/wsg_50_tcp.launch &
+xterm -e roslaunch kuka_ros kukaros.launch & #Kuka node
+xterm -e rosrun brick_check brick_check_node & #check brick node
+xterm -e roslaunch ../WSG50/launch/wsg_50_tcp.launch & #gripper node
+xterm -e rosrun plc_comm PLC_server.py & #plc node
 #Wait a bit (let rest of the nodes start before we start RobWorkStudio)
 sleep 2s
 #Start robworkstudioand open the SceneKu6 (also locates RobWorkStudio.ini, and starts the plug in defined there)

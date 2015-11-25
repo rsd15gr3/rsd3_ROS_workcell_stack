@@ -6,6 +6,7 @@
 #include "kuka_ros/setConfiguration.h"
 #include "kuka_ros/getIsMoving.h"
 #include "brick_check/check_brick.h"
+#include "plc_comm/plc_service.h"
 #include <std_msgs/Bool.h>
 #include <QObject>
 #include <rw/rw.hpp>
@@ -30,7 +31,6 @@
 #include <rw/math/Transform3D.hpp>
 #include <rw/math.hpp>
 #include <rw/invkin/JacobianIKSolver.hpp>
-#include <QObject>
 
 using namespace std;
 using namespace rw;
@@ -74,6 +74,11 @@ public:
     std::vector<brick> getBricks();
     bool moveToBrick(double xPos, double yPos,double yRot);
     bool checkPick();
+    bool conveyorBelt(int speed = 2, bool activate = true, bool forward = true);
+    bool conveyorBeltStop();
+    ros::NodeHandle n;
+    ros::ServiceClient clientGetBricks;
+    ros::ServiceClient clientConveyorBelt;
 
 private:
     rw::models::WorkCell::Ptr wc;
@@ -85,6 +90,7 @@ private:
     std::vector<Q> calulatePickupPath(Transform3D<> start, double m_length = 0.05);
     Q lastSetQ;
     int lastPickBrickColor;
+
 
 
 
