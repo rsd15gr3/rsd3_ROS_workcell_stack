@@ -61,7 +61,7 @@ def plc_serv_callback(request):
         rospy.ROSInterruptException
 
     # Request for stopping the conveyor
-    if request.activate == False:
+    if request.action == False:
         print "stop conveyor"
     	handlePLCOutput(ser, 0, "False")
     	return False 

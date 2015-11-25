@@ -8,8 +8,8 @@ def client():
     rospy.loginfo("Launchig PLC client")
     activate = False
 
-    forward = False      
-    speed = 2           # Speed 1: 50Hz, Speed 2: 35Hz
+    forward = True      
+    speed = 1           # Speed 1: 50Hz, Speed 2: 35Hz
     plc_service_client(activate, forward, speed)
 
 
