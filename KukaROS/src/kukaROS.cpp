@@ -1,5 +1,5 @@
 // Includes
-#include <ros/ros.h>
+#include "ros/ros.h"
 #include "kuka_ros/getConfiguration.h"
 #include "kuka_ros/setConfiguration.h"
 #include "kuka_ros/getQueueSize.h"
@@ -7,8 +7,9 @@
 #include "kuka_ros/stopRobot.h"
 #include "kuka_ros/getSafety.h"
 #include "std_msgs/String.h"
-#include <iostream>
 #include "PracticalSocket.h"
+
+#include <iostream>
 
 // Defines
 #define TCP_IP_SERVER           "192.168.100.50"

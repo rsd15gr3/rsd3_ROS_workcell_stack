@@ -23,5 +23,5 @@ include_directories(${catkin_INCLUDE_DIRS})
 SET(SrcFiles src/kukaROS.cpp src/PracticalSocket.cpp)
 
 add_executable(${PROJECT_NAME} ${SrcFiles})
-add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

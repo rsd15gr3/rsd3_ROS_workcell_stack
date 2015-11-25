@@ -60,7 +60,7 @@ include_directories(
 )
 
 # We use the settings that robwork studio uses
-SET(CMAKE_BUILD_TYPE Release)
+
 SET(RW_ROOT "$ENV{RW_ROOT}")
 SET(RWSTUDIO_ROOT "$ENV{RWS_ROOT}")
 
