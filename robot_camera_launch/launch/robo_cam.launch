@@ -7,7 +7,7 @@
     <param name="image_height" value="1080" />
     <param name="pixel_format" value="yuyv" />
     <param name="camera_frame_id" value="/camera_link" />
-    <param name="framerate" value="30" />
+    <param name="framerate" value="5" />
     <!--<param name="contrast" value="32" />
     <param name="brightness" value="32" />
     <param name="saturation" value="40" />-->

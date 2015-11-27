@@ -41,6 +41,7 @@ class state_machine : public QThread {
         bool ErrorFlag;
         bool quitfromgui;
         bool moving;
+        bool beltRunning;
         int state;
         int old_state;
         int position;

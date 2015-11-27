@@ -2,8 +2,8 @@
 
 state_machine_srv_calls::state_machine_srv_calls(){
 
- this->clientGetBricks = n.serviceClient<brick_detection::bricks>("brick_detector/getBricks",true);
- this->clientConveyorBelt = n.serviceClient<plc_comm::plc_service>("operate_PLC",true);
+ //this->clientGetBricks = n.serviceClient<brick_detection::bricks>("brick_detector/getBricks",true);
+ //this->clientConveyorBelt = n.serviceClient<plc_comm::plc_service>("operate_PLC",true);
 
 }
 
@@ -90,14 +90,17 @@ bool state_machine_srv_calls::closeGripper(bool BrickOnSide, double speedPct)
 bool state_machine_srv_calls::brickPresent(int color)
 {
     brick_detection::bricks _brick_srv;
-    clientGetBricks.call(_brick_srv);
-    if(_brick_srv.response.x.size() > 0)
+    if(ros::service::call("brick_detector/getBricks",_brick_srv))
     {
-        for(unsigned int i = 0; i !=_brick_srv.response.x.size(); i++)
-        {
-            if(color == _brick_srv.response.type[i])
-                return true;
-        }
+        cout << _brick_srv.response << endl;
+        if(_brick_srv.response.x.size() > 0)
+            {
+                for(unsigned int i = 0; i !=_brick_srv.response.x.size(); i++)
+                {
+                    if(color == _brick_srv.response.type[i])
+                        return true;
+                }
+            }
     }
     return false;
 }
@@ -291,10 +294,24 @@ bool state_machine_srv_calls::moveTo(Q _q){ ///TODO: SEND CONFIG
         _q_srv.request.q[3] = _q[3];
         _q_srv.request.q[4] = _q[4];
         _q_srv.request.q[5] = _q[5];
-        if(ros::service::call("/KukaNode/SetConfiguration",_q_srv))
+        bool srv_call_sucess = false;
+        unsigned int counter = 0;
+        while(!srv_call_sucess && counter < 5)
+        {
+            srv_call_sucess = ros::service::call("/KukaNode/SetConfiguration",_q_srv);
+            if(srv_call_sucess == false)
+                cout << "Kuka srv call: Failed to set configration!... retrying" << endl;
+            counter ++;
+        }
+        if (srv_call_sucess)
+        {
+            cout << "Kuka srv call: Configration set" << endl;
+            while(!this->closeToConfig()){}
             return true;
-        else
-            return false;
+
+        }
+        cout << "ERROR! Did not set configuration!" << endl;
+        return false;
     }
     else
     {
@@ -310,10 +327,10 @@ std::vector<brick> state_machine_srv_calls::getBricks()
     brick_detection::bricks _brick_srv;
     brick_detection::bricks::Request req;
     ros::service::call("/brick_detector/getBricks",_brick_srv);
-    //log().info() << _brick_srv.response << "/n";
+    cout << _brick_srv.response << endl;
     if(!(_brick_srv.response.x.size() > 0))
     {
-        //log().info() << "Error: Failed to call brick service!\n";
+        cout << "Error: Failed to call brick service!" << endl;
         return bricks;
     }
 
@@ -358,7 +375,7 @@ bool state_machine_srv_calls::checkPick(){
     _check_srv.request.type = lastPickBrickColor;
     if(ros::service::call("/brick_check_server/checkBrick", _check_srv))
     {
-
+        cout << "checkPick srv: _check_srv.response.picked" << endl;
         return _check_srv.response.picked;
     }
     else
@@ -396,7 +413,7 @@ bool state_machine_srv_calls::conveyorBelt(int speed, bool activate, bool forwar
     else
         return false;
 
-    if(clientConveyorBelt.call(_srv))
+    if(ros::service::call("/operate_PLC",_srv))
         return true;
     else
         cout << "ERROR!" << endl;
@@ -408,7 +425,7 @@ bool state_machine_srv_calls::conveyorBeltStop(){
     _srv.request.action = false;
     _srv.request.direction = true;
      _srv.request.preDefSpeed = 2;
-     if(clientConveyorBelt.call(_srv))
+     if(ros::service::call("/operate_PLC",_srv))
          return true;
      else
          return false;

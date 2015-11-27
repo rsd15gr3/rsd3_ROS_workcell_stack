@@ -1,5 +1,7 @@
 #include "state_machine.h"
 
+#define GripperDelay 500 //ms
+
 enum States{
     IDLE,
     READY,
@@ -30,7 +32,7 @@ state_machine::state_machine(rw::models::WorkCell::Ptr _wc, rw::kinematics::Stat
   srv_call = state_machine_srv_calls(_wc,_state,_device);
   idle = true;
   moving = false;
-  //old_state = IDLE;
+  beltRunning = false;
   position = INIT;
   timer = new QTimer(this);
   timer->setSingleShot(true);
@@ -89,6 +91,7 @@ void state_machine::run(){
               case START_BELT:
                   cout << "START_BELT" << endl;
                   srv_call.conveyorBelt();
+                  beltRunning = true;
                   old_state = state;
                   state = CAPTURING_IMAGE;
                   break;
@@ -99,11 +102,17 @@ void state_machine::run(){
                       old_state = state;
                       state = STOP_BELT;
                   }
+                  else if(!beltRunning)
+                  {
+                      old_state = state;
+                      state = START_BELT;
+                  }
                   break;
 
               case STOP_BELT:
                   cout << "STOP_BELT" << endl;
                   srv_call.conveyorBeltStop();
+                  beltRunning = false;
                   old_state = state;
                   state = CHECK_BRICKS;
                   break;
@@ -118,7 +127,7 @@ void state_machine::run(){
                   }
                   else{
                       old_state = state;
-                      state = START_BELT;
+                      state = CAPTURING_IMAGE;
                   }
                   break;
 
@@ -126,7 +135,7 @@ void state_machine::run(){
                   cout << "CLOSE_GRIP" << endl;
                   // Send close grip command.
                   srv_call.closeGripper();
-                  timer->start(1000); //start timer
+                  timer->start(GripperDelay); //start timer
                   old_state = state;
                   state = GRIP_CLOSED;
                   break;
@@ -157,7 +166,7 @@ void state_machine::run(){
 
               case OPEN_GRIP:
                   cout << "OPEN_GRIP" << endl;
-                  timer->start(1000);
+                  timer->start(GripperDelay);
                   srv_call.openGripper();
                   old_state = state;
                   state = GRIP_OPENED;
@@ -218,7 +227,7 @@ void state_machine::run(){
                                     case READY:
                                         cout << "old_state: READY" << endl;
                                         old_state = state;
-                                        state = START_BELT;
+                                        state = CAPTURING_IMAGE;
                                         break;
 
                                     case CHECK_BRICKS:

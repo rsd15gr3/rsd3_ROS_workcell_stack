@@ -287,7 +287,7 @@ std::vector<brick> detectBrick(Mat src){
 		blue_found.center=blue_points[i];
 		blue_found.center.x=(blue_found.center.x-360)*pixWidth;
 		blue_found.center.y=(310-blue_found.center.y)*pixWidth;
-		blue_found.color="Blue";
+		blue_found.color="blue";
 		double tanblue = (double)blue_lines[i][1]/(double)blue_lines[i][0];
 		blue_found.orientation=atan(tanblue)-(M_PI/2)+(M_PI/2);
 		if(blue_found.orientation<-(M_PI/2)){

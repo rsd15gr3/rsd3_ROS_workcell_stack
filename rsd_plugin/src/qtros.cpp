@@ -71,8 +71,8 @@ void QtROS::run(){
   while(ros::ok() && !quitfromgui) {
     ros::spinOnce(); 
 
-    if (ros::service::call("/KukaNode/GetConfiguration",_q_srv))
-               emit updateConfiguration(_q_srv);
+    //if (ros::service::call("/KukaNode/GetConfiguration",_q_srv))
+      //         emit updateConfiguration(_q_srv);
     
     ros::Duration(1./10.).sleep();
     }
