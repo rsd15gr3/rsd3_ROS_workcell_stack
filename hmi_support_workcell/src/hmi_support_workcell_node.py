@@ -61,7 +61,7 @@ class WorkcellHMI():
                     self.current_kuka_configuration.q[joint_ind] += self.kuka_joints_steps[joint_ind]
             except AttributeError:
                 print 'Do not know current KUKA configuration, so can not move it'
-            self.suggest_configuration()
+            #self.suggest_configuration()
         elif data[1] == 'mode':
             if data[2] == 'auto':
                 self.tp_automode_message.data = True
@@ -146,12 +146,12 @@ class BeltHMI():
                 self.speed = 2
             elif data[4] == 'fast':
                 self.speed = 1
-            self.send_control()
+            #self.send_control()
         elif data[1] == 'mode':
             if data[2] == 'auto':
                 self.tp_automode_message.data = True
             elif data[2] == 'manual':
-                self.stop_belt()
+                #self.stop_belt()
                 self.tp_automode_message.data = False
         else:
             print 'This structure of message is not yet implemented to be processed:', data
@@ -210,7 +210,7 @@ class Node():
         while not rospy.is_shutdown():
             self.belt.publish_tp_automode_message()
             self.wc.publish_tp_automode_message()
-            self.wc.get_kuka_configuration()       # This might slower down publishing automode topics (set timeout in launchfile)
+            #self.wc.get_kuka_configuration()       # This might slower down publishing automode topics (set timeout in launchfile)
             self.publishing_rate.sleep()
 
 # main function
