@@ -66,20 +66,21 @@ public:
     bool openGripper();
     bool closeGripper(bool BrickOnSide = false, double speedPct = 100);
     bool brickPresent(int color);
+    bool OrderedBrickPresent();
     bool robotMoving();
     bool closeToConfig();
     bool moveTo(Q _q);
     bool backOffBrick();
     bool moveToBrickColor(int color);
+    bool moveToOrderedBrick();
     std::vector<brick> getBricks();
     bool moveToBrick(double xPos, double yPos,double yRot);
     bool checkPick();
     bool conveyorBelt(int speed = 2, bool activate = true, bool forward = true);
     bool conveyorBeltStop();
     bool checkFroboPresent();
-    ros::NodeHandle n;
-    ros::ServiceClient clientGetBricks;
-    ros::ServiceClient clientConveyorBelt;
+    std::vector<int>currentOrder;
+
 
 private:
     rw::models::WorkCell::Ptr wc;
@@ -91,6 +92,7 @@ private:
     std::vector<Q> calulatePickupPath(Transform3D<> start, double m_length = 0.05);
     Q lastSetQ;
     int lastPickBrickColor;
+    int BrickColorToPick; //need for the system to handle change in orders
 
 
 

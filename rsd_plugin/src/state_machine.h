@@ -31,6 +31,7 @@ class state_machine : public QThread {
         void Error();
     public slots:
         void autoControlEnabled(bool);
+        void newOrder();
         void quitNow();
         void gripperTimeslot();
         void ErrorAck();
@@ -45,6 +46,7 @@ class state_machine : public QThread {
         int state;
         int old_state;
         int position;
+
         mutex idleMutex;
         state_machine_srv_calls srv_call;
         QTimer *timer;

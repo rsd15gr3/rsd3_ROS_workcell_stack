@@ -1,16 +1,17 @@
 #include "state_machine_srv_calls.h"
 
 state_machine_srv_calls::state_machine_srv_calls(){
-
- //this->clientGetBricks = n.serviceClient<brick_detection::bricks>("brick_detector/getBricks",true);
- //this->clientConveyorBelt = n.serviceClient<plc_comm::plc_service>("operate_PLC",true);
-
 }
 
 state_machine_srv_calls::state_machine_srv_calls(rw::models::WorkCell::Ptr _wc, rw::kinematics::State _state, Device::Ptr _device){
     this->wc = _wc;
     this->state = _state;
     this->device = _device;
+
+    //test
+    currentOrder.push_back(0);
+    currentOrder.push_back(1);
+    currentOrder.push_back(2);
 }
 
 bool state_machine_srv_calls::openGripper()
@@ -103,6 +104,32 @@ bool state_machine_srv_calls::brickPresent(int color)
             }
     }
     return false;
+}
+
+
+
+bool state_machine_srv_calls::OrderedBrickPresent()
+{
+    brick_detection::bricks _brick_srv;
+    if(ros::service::call("brick_detector/getBricks",_brick_srv))
+    {
+        cout << _brick_srv.response << endl;
+        if(_brick_srv.response.x.size() > 0)
+            {
+                for(unsigned int i = 0; i !=_brick_srv.response.x.size(); i++)
+                {
+                    for(int color : currentOrder)
+                    {
+                        if(color == _brick_srv.response.type[i])
+                        {
+                            BrickColorToPick = _brick_srv.response.type[i];
+                            return true;
+                        }
+                    }
+                }
+            }
+    }
+    return -1;
 }
 
 bool state_machine_srv_calls::robotMoving()
@@ -348,6 +375,19 @@ std::vector<brick> state_machine_srv_calls::getBricks()
     }
     //log().info() << "Found: " << _brick_srv.response.x.size() << " bricks\n";
     return bricks;
+}
+
+bool state_machine_srv_calls::moveToOrderedBrick(){
+    std::vector<brick> _bricks = this->getBricks();
+    for(brick _brick : _bricks)
+    {
+            if(_brick.color == BrickColorToPick)
+            {
+                this->moveToBrick(_brick.x,_brick.y,_brick.angle);
+                return true;
+            }
+    }
+    return false;
 }
 
 bool state_machine_srv_calls::moveToBrickColor(int color) {

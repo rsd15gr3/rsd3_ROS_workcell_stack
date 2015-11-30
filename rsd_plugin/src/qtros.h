@@ -37,11 +37,13 @@ class QtROS : public QThread {
     void rosQuits();
     void autoControlEnabledSignal(bool); //requst for manual control
     void newImage(cv::Mat);
+    void newOrder();
     void updateConfiguration(kuka_ros::getConfiguration);
   private:
     bool autoControlEnabled = true;
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     void manualControlCallback(const std_msgs::Bool::ConstPtr& msg);
+    void orderCallback(const std_msgs::Bool::ConstPtr& msg);
     bool setConfigurationCallback(kuka_ros::setConfiguration::Request &req, kuka_ros::setConfiguration::Response &res);
     bool quitfromgui;
     sensor_msgs::ImageConstPtr _imageIn;
@@ -50,6 +52,7 @@ class QtROS : public QThread {
     image_transport::ImageTransport _it;
     image_transport::Subscriber _image_sub;
     ros::Subscriber manualControl_sub;
+    ros::Subscriber order_sub;
     ros::ServiceClient _q_client;
     ros::ServiceServer setConfigurationService;
     kuka_ros::getConfiguration _q_srv;

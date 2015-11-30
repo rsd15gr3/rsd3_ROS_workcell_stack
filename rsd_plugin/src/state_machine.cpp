@@ -51,6 +51,10 @@ void state_machine::SetIdle(bool _idle){
 
 }
 
+void state_machine::newOrder(){
+    //update order
+}
+
 void state_machine::gripperTimeslot(){
     timeout = true;
 }
@@ -98,7 +102,7 @@ void state_machine::run(){
 
               case CAPTURING_IMAGE:
                   cout << "CAPTURING_IMAGE" << endl;
-                  if(srv_call.brickPresent(0)){ ///<<---0 is the index for the brick color
+                  if(srv_call.OrderedBrickPresent()){ ///<<---0 is the index for the brick color
                       old_state = state;
                       state = STOP_BELT;
                   }
@@ -120,7 +124,7 @@ void state_machine::run(){
               case CHECK_BRICKS:
                   cout << "CHECK_BRICKS" << endl;
                   // Get brick positions
-                  if( srv_call.brickPresent(0)/* There are bricks to be picked. */){///<<---0 is the index for the brick color
+                  if( srv_call.OrderedBrickPresent()/* There are bricks to be picked. */){///<<---0 is the index for the brick color
                       old_state = state;
                       state = MOVING;
                       position = PICK;

@@ -11,6 +11,7 @@ QtROS::QtROS(): _it(_nh) {
   //_image_sub = _it.subscribe(SUBSCRIBER, 1, &QtROS::imageCallback, this);
    setConfigurationService = _nh.advertiseService("/rsdPlugin/SetConfiguration", &QtROS::setConfigurationCallback, this);
    manualControl_sub = _nh.subscribe("/wc_automode", 1, &QtROS::manualControlCallback, this);
+   order_sub = _nh.subscribe("/wc_order", 1,&QtROS::orderCallback,this); ///NEEDS TESTING
   quitfromgui = false; }
 
 void QtROS::quitNow(){ 
@@ -18,16 +19,22 @@ void QtROS::quitNow(){
 
 void QtROS::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
-   _imageIn = msg;
-  try{
+    _imageIn = msg;
+    try{
      _imageOut = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
      emit newImage(_imageOut->image);
-  }
-  catch(cv_bridge::Exception& e)
-  {
+    }
+    catch(cv_bridge::Exception& e)
+    {
          ROS_ERROR("cv_bridge exception: %s", e.what());
-         return; 
-  }
+         return;
+    }
+}
+
+void QtROS::orderCallback(const std_msgs::Bool::ConstPtr& msg) //change msg type
+{
+  ///get order
+    emit newOrder();
 }
 
 void QtROS::manualControlCallback(const std_msgs::Bool::ConstPtr& msg)
@@ -74,7 +81,7 @@ void QtROS::run(){
     //if (ros::service::call("/KukaNode/GetConfiguration",_q_srv))
       //         emit updateConfiguration(_q_srv);
     
-    ros::Duration(1./10.).sleep();
+    ros::Duration(1./5.).sleep();
     }
   if (!quitfromgui) {
     emit rosQuits();
