@@ -31,26 +31,54 @@ bool checkBrick(brick_check::check_brick::Request &req, brick_check::check_brick
     cv::Rect ROI(input_img_.cols/2-120-10, input_img_.rows-150, 240, 150);
     cv::Mat region = input_img_(ROI);
 
+    cv::Rect FrobROI(1020,440,50,50);
+    cv::Mat FrobGreyScale, FrobThres;
+    cv::Mat Frobregion = input_img_(FrobROI);
+
+    //cv::imshow("testregion", Frobregion);
+
+    cv::cvtColor(Frobregion, FrobGreyScale, CV_BGR2GRAY);
+    //cv::imshow("testGray", FrobGreyScale);
+    cv::threshold(FrobGreyScale, FrobThres, 100, 255, cv::THRESH_BINARY);
+    //cv::imshow("testThres", FrobThres);
+
+    double total = FrobThres.cols * FrobThres.rows;
+    double Floor_proportion = cv::countNonZero(FrobThres) / total;
+    ROS_INFO("floor: %f" ,Floor_proportion);
+    //cv::waitKey();
     cv::Mat hsv, red, blue, yellow;
     std::vector<cv::Mat> channels(3);
     cv::cvtColor(region, hsv, CV_BGR2HSV);
     cv::split(hsv, channels);
+
+
 
     cv::threshold(channels[0], red, 10, 255, cv::THRESH_BINARY_INV);
     cv::threshold(channels[0], blue, 100, 255, cv::THRESH_BINARY);
     cv::threshold(channels[0], yellow, 35, 255, cv::THRESH_BINARY_INV);
     cv::threshold(yellow, yellow, 60, 255, cv::THRESH_BINARY);
 
-    double total = channels[0].cols * channels[0].rows;
+    total = channels[0].cols * channels[0].rows;
     double red_proportion = cv::countNonZero(red) / total;
     double blue_proportion = cv::countNonZero(blue) / total;
     double yellow_proportion = cv::countNonZero(yellow) / total;
+    mtx.unlock();
+
+    if(Floor_proportion > 0.2 && req.type == 3)
+    {
+        res.picked = true;
+        return true;
+    }
+    else  if(req.type == 3){
+        res.picked = false;
+        return true;
+    }
 
     if(red_proportion > 0.2 && req.type == 0){
         res.picked = true;
         return true;
     }
-    else{
+    else if(req.type == 0){
         res.picked = false;
         return true;
     }
@@ -59,18 +87,18 @@ bool checkBrick(brick_check::check_brick::Request &req, brick_check::check_brick
         res.picked = true;
         return true;
     }
-    else{
+    else if(req.type == 1){
         res.picked = false;
-        return false;
+        return true;
     }
 
     if(yellow_proportion > 0.2 && req.type == 2){
         res.picked = true;
         return true;
     }
-    else{
+    else if(req.type == 2){
         res.picked = false;
-        return false;
+        return true;
     }
 
     return false;
