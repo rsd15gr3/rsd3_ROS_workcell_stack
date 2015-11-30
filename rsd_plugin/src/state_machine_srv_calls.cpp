@@ -385,6 +385,21 @@ bool state_machine_srv_calls::checkPick(){
     }
 }
 
+bool state_machine_srv_calls::checkFroboPresent(){
+    brick_check::check_brick _check_srv;
+    _check_srv.request.type = 3;
+    if(ros::service::call("/brick_check_server/checkBrick", _check_srv))
+    {
+        cout << "checkPick srv: _check_srv.response.picked" << endl;
+        return _check_srv.response.picked;
+    }
+    else
+    {
+        cout << "check brick: faild to call srv!" << endl;
+        return false;
+    }
+}
+
 bool state_machine_srv_calls::backOffBrick(){
     if (!this->pickupPath.size() > 0)
     {

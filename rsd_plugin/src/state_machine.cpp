@@ -166,10 +166,15 @@ void state_machine::run(){
 
               case OPEN_GRIP:
                   cout << "OPEN_GRIP" << endl;
-                  timer->start(GripperDelay);
-                  srv_call.openGripper();
-                  old_state = state;
-                  state = GRIP_OPENED;
+                  if(srv_call.checkFroboPresent()) //wait for frobo
+                  {
+                      timer->start(GripperDelay);
+                      srv_call.openGripper();
+                      old_state = state;
+                      state = GRIP_OPENED;
+                  }
+                  else
+                      cout << "waiting for Frobo..." << endl;
                   break;
 
               case GRIP_OPENED:

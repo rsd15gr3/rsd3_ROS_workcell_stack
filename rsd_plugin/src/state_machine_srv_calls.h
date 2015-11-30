@@ -76,6 +76,7 @@ public:
     bool checkPick();
     bool conveyorBelt(int speed = 2, bool activate = true, bool forward = true);
     bool conveyorBeltStop();
+    bool checkFroboPresent();
     ros::NodeHandle n;
     ros::ServiceClient clientGetBricks;
     ros::ServiceClient clientConveyorBelt;
