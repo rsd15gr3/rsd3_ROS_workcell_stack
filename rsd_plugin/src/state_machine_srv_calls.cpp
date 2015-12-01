@@ -7,7 +7,7 @@ state_machine_srv_calls::state_machine_srv_calls(rw::models::WorkCell::Ptr _wc, 
     this->wc = _wc;
     this->state = _state;
     this->device = _device;
-
+    this->BrickColorToPick = -1;
     //test
     currentOrder.push_back(0);
     currentOrder.push_back(1);
@@ -110,26 +110,44 @@ bool state_machine_srv_calls::brickPresent(int color)
 
 bool state_machine_srv_calls::OrderedBrickPresent()
 {
-    brick_detection::bricks _brick_srv;
-    if(ros::service::call("brick_detector/getBricks",_brick_srv))
-    {
-        cout << _brick_srv.response << endl;
-        if(_brick_srv.response.x.size() > 0)
-            {
-                for(unsigned int i = 0; i !=_brick_srv.response.x.size(); i++)
-                {
-                    for(int color : currentOrder)
-                    {
-                        if(color == _brick_srv.response.type[i])
+    _bricks.clear();
+    bool r = false;
+    bool b = false;
+    bool y = false;
+    std::vector<int> PresentOrderedColors;
+    this->_bricks = this->getBricks();
+    if(!_bricks.empty()){
+            for(brick _brick : _bricks){
+                for(int color : currentOrder){
+                    if(color == _brick.color){
+                        //if a orderen color is present, then push it back into the vector (but only once)
+                        if(color == 0 && r == false)
                         {
-                            BrickColorToPick = _brick_srv.response.type[i];
-                            return true;
+                            r = true;
+                            PresentOrderedColors.push_back(_brick.color);
+                        }
+                        else if(color == 1 && y == false)
+                        {
+                            y = true;
+                            PresentOrderedColors.push_back(_brick.color);
+                        }
+                        else if(color == 2 && b == false)
+                        {
+                            b = false;
+                            PresentOrderedColors.push_back(_brick.color);
                         }
                     }
                 }
             }
     }
-    return -1;
+    if(!PresentOrderedColors.empty()){ //if the vector is not empty, pick a random color from it
+        int randomPresentPrderedColor = PresentOrderedColors[rand() % PresentOrderedColors.size()];
+        BrickColorToPick = randomPresentPrderedColor;
+        cout << "Found " << randomPresentPrderedColor << " \"brick type\" to brick" << endl;
+        return true;
+
+    }
+    return false;
 }
 
 bool state_machine_srv_calls::robotMoving()
@@ -161,6 +179,23 @@ bool state_machine_srv_calls::closeToConfig(){
     }
     else
         return false;
+}
+
+bool state_machine_srv_calls::removeFromOrder(int color)
+{
+    for(std::vector<int>::iterator it=currentOrder.begin(); it!=currentOrder.end(); ++it)
+    {
+        if(*it == color)
+        {
+            currentOrder.erase(it);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool state_machine_srv_calls::removeLastPickedFromOrder(){
+    return removeFromOrder(this->lastPickBrickColor);
 }
 
 std::vector<Q> state_machine_srv_calls::JacobianIKSover_50trys_Contrainted(Transform3D<> _target){
@@ -282,7 +317,7 @@ bool state_machine_srv_calls::moveToBrick(double xPos, double yPos,double yRot) 
     Rotation3D<> RotBrick = RotBrickRPY.toRotation3D();
     Transform3D<> OverBrickTransformation(PosOverBrick,RotBrick);
     OverBrickTransformation.multiply(_RobotConveyorTransformation,OverBrickTransformation,OverBrickTransformation);
-
+    pickupPath.clear();//clear the vector, so we dont use on any old data
     pickupPath = this->calulatePickupPath(OverBrickTransformation);
     if(!pickupPath.size() > 0)
     {
@@ -378,21 +413,31 @@ std::vector<brick> state_machine_srv_calls::getBricks()
 }
 
 bool state_machine_srv_calls::moveToOrderedBrick(){
-    std::vector<brick> _bricks = this->getBricks();
-    for(brick _brick : _bricks)
-    {
-            if(_brick.color == BrickColorToPick)
-            {
-                this->moveToBrick(_brick.x,_brick.y,_brick.angle);
-                return true;
+    //std::vector<brick> _bricks = this->getBricks();
+    std::vector<brick> _colorbricks;
+
+    //pub all bricks of the type "BrickColorToPick" into a vector
+    for(brick _brick : _bricks){
+            if(_brick.color == BrickColorToPick){
+                _colorbricks.push_back(_brick);
             }
     }
+    if(!_colorbricks.empty())
+    {
+        //brick random brick
+        brick randomBrick = _colorbricks[rand() % _colorbricks.size()];
+        cout << "x: " << randomBrick.x << " y: " << randomBrick.y << " angle: " << randomBrick.angle << endl;
+        lastPickBrickColor = randomBrick.color; //set lastPickBrickColor (so check brick can verify pick)
+        return this->moveToBrick(randomBrick.x,randomBrick.y,randomBrick.angle);
+    }
+    cout << "WARNING!: no brick of the of type: " << BrickColorToPick << " Found. " <<
+            "This should never happen" << endl;
     return false;
 }
 
 bool state_machine_srv_calls::moveToBrickColor(int color) {
     lastPickBrickColor = color;
-    std::vector<brick> _bricks = this->getBricks();
+    _bricks = this->getBricks();
 
     for(brick _brick : _bricks)
     {
@@ -403,8 +448,7 @@ bool state_machine_srv_calls::moveToBrickColor(int color) {
                          << "X: " << _brick.x << "\n"
                          << "Y: " << _brick.y << "\n"
                          << "Angle: " << _brick.angle << "\n";*/
-            this->moveToBrick(_brick.x,_brick.y,_brick.angle);
-            return true;
+            return this->moveToBrick(_brick.x,_brick.y,_brick.angle);
         }
     }
     return false;
@@ -415,7 +459,7 @@ bool state_machine_srv_calls::checkPick(){
     _check_srv.request.type = lastPickBrickColor;
     if(ros::service::call("/brick_check_server/checkBrick", _check_srv))
     {
-        cout << "checkPick srv: _check_srv.response.picked" << endl;
+        cout << "checkPick srv: " << _check_srv.response.picked << endl;
         return _check_srv.response.picked;
     }
     else
@@ -453,7 +497,7 @@ bool state_machine_srv_calls::backOffBrick(){
             this->SetConfiguration(pickupPath.at(i));
         }*/
         this->moveTo(pickupPath.front());
-        this->moveTo(Configurations::ConfigImgCapture);
+        this->moveTo(Configurations::ConfigCheckPick);
         return true;
     }
 }

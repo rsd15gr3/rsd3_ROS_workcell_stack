@@ -46,7 +46,9 @@ class state_machine : public QThread {
         int state;
         int old_state;
         int position;
+        int failCounter;
 
+        bool stateprinted;
         mutex idleMutex;
         state_machine_srv_calls srv_call;
         QTimer *timer;

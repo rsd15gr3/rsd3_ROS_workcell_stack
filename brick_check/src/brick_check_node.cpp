@@ -35,17 +35,14 @@ bool checkBrick(brick_check::check_brick::Request &req, brick_check::check_brick
     cv::Mat FrobGreyScale, FrobThres;
     cv::Mat Frobregion = input_img_(FrobROI);
 
-    //cv::imshow("testregion", Frobregion);
-
+    double Floor_proportion, total;
+    if(req.type == 3)
+    {
     cv::cvtColor(Frobregion, FrobGreyScale, CV_BGR2GRAY);
-    //cv::imshow("testGray", FrobGreyScale);
     cv::threshold(FrobGreyScale, FrobThres, 100, 255, cv::THRESH_BINARY);
-    //cv::imshow("testThres", FrobThres);
-
-    double total = FrobThres.cols * FrobThres.rows;
-    double Floor_proportion = cv::countNonZero(FrobThres) / total;
-    ROS_INFO("floor: %f" ,Floor_proportion);
-    //cv::waitKey();
+    total = FrobThres.cols * FrobThres.rows;
+    Floor_proportion = cv::countNonZero(FrobThres) / total;
+    }
     cv::Mat hsv, red, blue, yellow;
     std::vector<cv::Mat> channels(3);
     cv::cvtColor(region, hsv, CV_BGR2HSV);
@@ -66,41 +63,49 @@ bool checkBrick(brick_check::check_brick::Request &req, brick_check::check_brick
 
     if(Floor_proportion > 0.2 && req.type == 3)
     {
+        ROS_INFO("Frobo present");
         res.picked = true;
         return true;
     }
     else  if(req.type == 3){
+        ROS_INFO("Frobo not present");
         res.picked = false;
         return true;
     }
 
     if(red_proportion > 0.2 && req.type == 0){
+        ROS_INFO("Redbrick grasped");
         res.picked = true;
         return true;
     }
     else if(req.type == 0){
+        ROS_INFO("Redbrick not grasped");
         res.picked = false;
         return true;
     }
 
-    if(blue_proportion > 0.2 && req.type == 1){
-        res.picked = true;
-        return true;
-    }
-    else if(req.type == 1){
-        res.picked = false;
-        return true;
-    }
-
-    if(yellow_proportion > 0.2 && req.type == 2){
+    if(blue_proportion > 0.2 && req.type == 2){
+        ROS_INFO("Bluebrick grasped");
         res.picked = true;
         return true;
     }
     else if(req.type == 2){
+        ROS_INFO("Bluebrick not grasped");
         res.picked = false;
         return true;
     }
 
+    if(yellow_proportion > 0.2 && req.type == 1){
+        ROS_INFO("yellowbrick grasped");
+        res.picked = true;
+        return true;
+    }
+    else if(req.type == 1){
+        ROS_INFO("yellowbrick not grasped");
+        res.picked = false;
+        return true;
+    }
+    ROS_ERROR("Bad req.type! (req.type must have a value of 0,1,2 or 3!)");
     return false;
 }
 
@@ -115,7 +120,7 @@ int main(int argc, char** argv){
     image_sub = it.subscribe(camera_topic, 1, &imageCB);
 
     ros::ServiceServer service = n.advertiseService("checkBrick", checkBrick);
-
+    ROS_INFO("Started brick_check_server...");
     ros::spin();
     return 0;
 }

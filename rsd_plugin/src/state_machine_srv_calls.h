@@ -31,6 +31,7 @@
 #include <rw/math/Transform3D.hpp>
 #include <rw/math.hpp>
 #include <rw/invkin/JacobianIKSolver.hpp>
+#include <random>
 
 using namespace std;
 using namespace rw;
@@ -80,6 +81,8 @@ public:
     bool conveyorBeltStop();
     bool checkFroboPresent();
     std::vector<int>currentOrder;
+    bool removeFromOrder(int color);
+    bool removeLastPickedFromOrder();
 
 
 private:
@@ -93,7 +96,7 @@ private:
     Q lastSetQ;
     int lastPickBrickColor;
     int BrickColorToPick; //need for the system to handle change in orders
-
+    std::vector<brick> _bricks;
 
 
 

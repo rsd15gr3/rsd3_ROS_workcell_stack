@@ -1,6 +1,7 @@
 #include "state_machine.h"
 
 #define GripperDelay 500 //ms
+#define MAXFAILS 5
 
 enum States{
     IDLE,
@@ -33,6 +34,8 @@ state_machine::state_machine(rw::models::WorkCell::Ptr _wc, rw::kinematics::Stat
   idle = true;
   moving = false;
   beltRunning = false;
+  stateprinted = false;
+  failCounter = 0;
   position = INIT;
   timer = new QTimer(this);
   timer->setSingleShot(true);
@@ -94,6 +97,7 @@ void state_machine::run(){
 
               case START_BELT:
                   cout << "START_BELT" << endl;
+                  failCounter = 0; //We moved the belt (changed the "bricks state") reset fail counter
                   srv_call.conveyorBelt();
                   beltRunning = true;
                   old_state = state;
@@ -101,8 +105,8 @@ void state_machine::run(){
                   break;
 
               case CAPTURING_IMAGE:
-                  cout << "CAPTURING_IMAGE" << endl;
-                  if(srv_call.OrderedBrickPresent()){ ///<<---0 is the index for the brick color
+                  cout << "CAPTURING_IMAGE, fails: " << failCounter << endl;
+                  if(srv_call.OrderedBrickPresent() && failCounter < MAXFAILS){
                       old_state = state;
                       state = STOP_BELT;
                   }
@@ -124,7 +128,7 @@ void state_machine::run(){
               case CHECK_BRICKS:
                   cout << "CHECK_BRICKS" << endl;
                   // Get brick positions
-                  if( srv_call.OrderedBrickPresent()/* There are bricks to be picked. */){///<<---0 is the index for the brick color
+                  if( srv_call.OrderedBrickPresent() && failCounter < MAXFAILS){
                       old_state = state;
                       state = MOVING;
                       position = PICK;
@@ -145,8 +149,13 @@ void state_machine::run(){
                   break;
 
               case GRIP_CLOSED:
-                  cout << "GRIP_CLOSED" << endl;
+                  if(!stateprinted){
+                      cout << "GRIP_CLOSED" << endl;
+                      stateprinted = true;
+                  }
+
                   if( timeout ){ //wait for timer
+                      stateprinted = false;
                       timeout = false;
                       old_state = state;
                       state = MOVING;
@@ -163,8 +172,10 @@ void state_machine::run(){
                       position = DROP;
                   }
                   else{
+                      failCounter ++; //failed to pick brick count up in fails
+                      cout << "fail counter: "<< failCounter << endl;
                       old_state = state;
-                      state = CHECK_BRICKS;
+                      state = READY;//CHECK_BRICKS;
                   }
                   break;
 
@@ -175,6 +186,7 @@ void state_machine::run(){
                       timer->start(GripperDelay);
                       srv_call.openGripper();
                       old_state = state;
+                      srv_call.removeLastPickedFromOrder();
                       state = GRIP_OPENED;
                   }
                   else
@@ -184,6 +196,7 @@ void state_machine::run(){
               case GRIP_OPENED:
                   cout << "GRIP_OPENED" << endl;
                   if( timeout ){
+                      failCounter = 0;
                       timeout = false;
                       old_state = state;
                       state = READY;
@@ -218,7 +231,12 @@ void state_machine::run(){
                               case PICK:
                                   cout << "MOVING: PICK" << endl;
                                   srv_call.openGripper();
-                                  srv_call.moveToBrickColor(0);///<--0 is the index for the brick color
+                                  if(!srv_call.moveToOrderedBrick())
+                                  {
+                                      cout << "Failed to plan pickup path" << endl;
+                                      failCounter++; //failed to find path count up in fails
+                                      state = READY;//CAPTURING_IMAGE;//READY; //if we cant get the brick, when move the belt
+                                  }
                                   break;
 
                               default:
@@ -267,10 +285,9 @@ void state_machine::run(){
                   break;
 
               case ERROR:
-                  if( true/*msgBox.exec() == QMessageBox::Ok*//* User acknowledge */ ){
+                       cout << "ERROR! going to Ready state" << endl;
                       old_state = state;
                       state = READY;
-                  }
                   break;
 
               default:
