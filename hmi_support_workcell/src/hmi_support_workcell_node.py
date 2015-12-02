@@ -8,19 +8,20 @@ subscribing:
 
 publishing:
 - /ui/wc_automode   (20Hz, Workcell's automode state, BoolStamped)
-- /ui/belt_automode (20Hz, Workcell's automode state, BoolStamped)
+- /ui/belt_automode (20Hz, Belt's automode state, BoolStamped)
+- /ui/belt_activated (On Manual Control Change, Belt's activated state, BoolStamped)
+- /ui/belt_forward (On Manual Control Change, Belt's forward direction state, BoolStamped)
+- /ui/belt_speed (On Manual Control Change, Belt's speed value, IntStamped, 1 ... fast, 2 ... slow)
 
 calling services:
-- /rsdPlugin/SetConfiguration (Manual control from HMI)
-- /KukaNode/GetConfiguration (Reading current KUKA position)
 - /operate_PLC (Control of Conveyor Belt)
 
 """
 
 import rospy
 from std_msgs.msg import String
-from msgs.msg import BoolStamped
-from ast import literal_eval
+from msgs.msg import BoolStamped, IntStamped
+from plc_comm.srv import plc_service as plc_service_type
 
 
 class WorkcellHMI():
@@ -33,13 +34,6 @@ class WorkcellHMI():
         
         ''' Read parameters from launchfile '''
         self.tp_automode = rospy.get_param('~wc_tp_automode', '/ui/wc_automode')
-        self.srv_set_conf_name = rospy.get_param('~wc_srv_set_conf_name', '/rsdPlugin/SetConfiguration')
-        self.srv_set_conf_type = rospy.get_param('~wc_srv_set_conf_type', 'kuka_ros/setConfiguration')
-        self.srv_set_conf_timeout = rospy.get_param('~wc_srv_set_conf_timeout', None)
-        self.srv_get_conf_name = rospy.get_param('~wc_srv_get_conf_name', '/KukaNode/GetConfiguration')
-        self.srv_get_conf_type = rospy.get_param('~wc_srv_get_conf_type', 'kuka_ros/getConfiguration')
-        self.srv_get_conf_timeout = rospy.get_param('~wc_srv_get_conf_timeout', None)
-        self.kuka_joints_steps = literal_eval(rospy.get_param('~kuka_joints_steps', '[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]'))
 
         ''' Setup topics '''
         # Setup Workcell automode publish topic
@@ -47,59 +41,12 @@ class WorkcellHMI():
         self.tp_automode_message.data = False
         self.tp_automode_publisher = rospy.Publisher(self.tp_automode, BoolStamped, queue_size=1)
 
-        ''' Variables '''
-        self.current_kuka_configuration = None
-
     def decode_control(self, data):
-        if data[1] == 'joint':
-            self.tp_automode_message.data = False
-            joint_ind = int(data[2][1])
-            try:
-                if data[3] == 'down':
-                    self.current_kuka_configuration.q[joint_ind] -= self.kuka_joints_steps[joint_ind]
-                elif data[3] == 'up':
-                    self.current_kuka_configuration.q[joint_ind] += self.kuka_joints_steps[joint_ind]
-            except AttributeError:
-                print 'Do not know current KUKA configuration, so can not move it'
-            #self.suggest_configuration()
-        elif data[1] == 'mode':
+        if data[1] == 'mode':
             if data[2] == 'auto':
                 self.tp_automode_message.data = True
             elif data[2] == 'manual':
-                self.stop_workcell()
                 self.tp_automode_message.data = False
-        else:
-            print 'This structure of message is not yet implemented to be processed:', data
-
-    def stop_workcell(self):
-        # TODO
-        pass
-
-    def get_kuka_configuration(self):
-        try:
-            rospy.wait_for_service(self.srv_get_conf_name, timeout=self.srv_get_conf_timeout)
-            try:
-                service = rospy.ServiceProxy(self.srv_get_conf_name, self.srv_get_conf_type)
-                self.current_kuka_configuration = service()     # TODO
-                print self.current_kuka_configuration
-            except rospy.ServiceException:
-                self.current_kuka_configuration = None
-                print 'Service call (get_configuration) failed.'
-        except rospy.ROSException:
-            self.current_kuka_configuration = None
-            print "WC Manual Control: GetConf Service unreachable!"
-
-    def suggest_configuration(self):
-        try:
-            rospy.wait_for_service(self.srv_set_conf_name, timeout=self.srv_set_conf_timeout)
-            try:
-                service = rospy.ServiceProxy(self.srv_set_conf_name, self.srv_set_conf_type)
-                reply = service(self.current_kuka_configuration)
-                print reply
-            except rospy.ServiceException:
-                print 'Service call (manual_configuration) failed.'
-        except rospy.ROSException:
-            print "WC Manual Control: SetConf Service unreachable!"
 
     def publish_tp_automode_message(self):
         self.tp_automode_message.header.stamp = rospy.get_rostime()
@@ -116,28 +63,46 @@ class BeltHMI():
 
         ''' Read parameters from launchfile '''
         self.tp_automode = rospy.get_param('~belt_tp_automode', '/ui/belt_automode')
-        self.srv_operate_name = rospy.get_param('~belt_srv_operate_name', 'operate_PLC')
-        self.srv_operate_type = rospy.get_param('~belt_srv_operate_type', 'plc_comm/plc_service')
-        self.srv_operate_timeout = rospy.get_param('~belt_srv_operate_timeout', None)
-
+        self.tp_activated = rospy.get_param('~belt_tp_activated', '/ui/belt_activated')
+        self.tp_forward = rospy.get_param('~belt_tp_forward', '/ui/belt_forward')
+        self.tp_speed = rospy.get_param('~belt_tp_speed', '/ui/belt_speed')
+        self.srv_operate_plc = rospy.get_param('~belt_srv_operate_name', 'operate_PLC')
+        self.srv_operate_plc_timeout = rospy.get_param('~belt_srv_operate_timeout', None)
+        
+        ''' Variables '''
+        self.automode = False
+        self.activated = False
+        self.forward = True
+        self.speed = 1
+        
         ''' Setup topics '''
         # Setup Belt automode publish topic
         self.tp_automode_message = BoolStamped()
-        self.tp_automode_message.data = False
+        self.tp_automode_message.data = self.automode
         self.tp_automode_publisher = rospy.Publisher(self.tp_automode, BoolStamped, queue_size=1)
-
-        ''' Variables '''
-        self.activate = False
-        self.forward = True
-        self.speed = 1
+        
+        # Setup Belt activated publish topic
+        self.tp_activated_message = BoolStamped()
+        self.tp_activated_message.data = self.activated
+        self.tp_activated_publisher = rospy.Publisher(self.tp_activated, BoolStamped, queue_size=1)
+        
+        # Setup Belt forward publish topic
+        self.tp_forward_message = BoolStamped()
+        self.tp_forward_message.data = self.forward
+        self.tp_forward_publisher = rospy.Publisher(self.tp_forward, BoolStamped, queue_size=1)
+        
+        # Setup Belt speed publish topic
+        self.tp_speed_message = IntStamped()
+        self.tp_speed_message.data = self.speed
+        self.tp_speed_publisher = rospy.Publisher(self.tp_speed, IntStamped, queue_size=1)
 
     def decode_control(self, data):
         if data[1] == 'srv':
-            self.tp_automode_message.data = False
+            self.automode = False
             if data[2] == 'on':
-                self.activate = True
+                self.activated = True
             elif data[2] == 'off':
-                self.activate = False
+                self.activated = False
             if data[3] == 'forward':
                 self.forward = True
             elif data[3] == 'backwards':
@@ -146,36 +111,58 @@ class BeltHMI():
                 self.speed = 2
             elif data[4] == 'fast':
                 self.speed = 1
-            #self.send_control()
+            self.send_control()
         elif data[1] == 'mode':
             if data[2] == 'auto':
-                self.tp_automode_message.data = True
+                self.automode = True
             elif data[2] == 'manual':
-                #self.stop_belt()
-                self.tp_automode_message.data = False
+                self.stop_belt()
+                self.automode = False
         else:
             print 'This structure of message is not yet implemented to be processed:', data
 
     def stop_belt(self):
-        self.activate = False
+        self.activated = False
         self.send_control()
 
     def send_control(self):
         rospy.loginfo("Launching PLC client")
         try:
-            rospy.wait_for_service(self.srv_operate_name, timeout=self.srv_operate_timeout)
+            rospy.wait_for_service(self.srv_operate_plc, timeout=self.srv_operate_plc_timeout)
             try:
-                plc_service = rospy.ServiceProxy(self.srv_operate_name, self.srv_operate_type)
-                reply = plc_service(self.activate, self.forward, self.speed)
+                service = rospy.ServiceProxy(self.srv_operate_plc, plc_service_type)
+                reply = service(self.activated, self.forward, self.speed)
                 print 'PLC Service Command Status:', reply.activated
             except rospy.ServiceException, e:
                 print "Service call failed: %s"%e
         except rospy.ROSException:
             print "PLC Service unreachable!"
+        self.publish_belt_info()
+
+    def publish_belt_info(self):
+        self.publish_tp_activated_message()
+        self.publish_tp_forward_message()
+        self.publish_tp_speed_message()
 
     def publish_tp_automode_message(self):
         self.tp_automode_message.header.stamp = rospy.get_rostime()
+        self.tp_automode_message.data = self.automode
         self.tp_automode_publisher.publish(self.tp_automode_message)
+        
+    def publish_tp_activated_message(self):
+        self.tp_activated_message.header.stamp = rospy.get_rostime()
+        self.tp_activated_message.data = self.activated
+        self.tp_activated_publisher.publish(self.tp_activated_message)
+        
+    def publish_tp_forward_message(self):
+        self.tp_forward_message.header.stamp = rospy.get_rostime()
+        self.tp_forward_message.data = self.forward
+        self.tp_forward_publisher.publish(self.tp_forward_message)
+        
+    def publish_tp_speed_message(self):
+        self.tp_speed_message.header.stamp = rospy.get_rostime()
+        self.tp_speed_message.data = self.speed
+        self.tp_speed_publisher.publish(self.tp_speed_message)
 
 
 class Node():
@@ -210,7 +197,6 @@ class Node():
         while not rospy.is_shutdown():
             self.belt.publish_tp_automode_message()
             self.wc.publish_tp_automode_message()
-            #self.wc.get_kuka_configuration()       # This might slower down publishing automode topics (set timeout in launchfile)
             self.publishing_rate.sleep()
 
 # main function

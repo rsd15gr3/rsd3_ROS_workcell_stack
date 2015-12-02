@@ -1,0 +1,11 @@
+<!-- Launch file for testing the conveyor belt manual control from HMI -->
+<launch>
+    <!-- HMI support node -->
+    <include file="$(find hmi_support_workcell)/launch/hmi_support_workcell.launch" />
+
+    <!-- rosbridge -->
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+
+    <!-- PLC server-->
+    <node pkg="plc_comm" name="plc_comm_node" type="PLC_server.py" />
+</launch>

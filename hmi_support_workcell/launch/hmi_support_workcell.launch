@@ -4,26 +4,19 @@
     <node pkg="hmi_support_workcell" name="hmi_support_workcell_node" type="hmi_support_workcell_node.py" output="screen">
         <!-- Workcell's params -->
         <param name="wc_tp_automode" value="/ui/wc_automode" />
-        <param name="wc_srv_set_conf_name" value="/rsdPlugin/SetConfiguration" />
-        <param name="wc_srv_set_conf_type" value="kuka_ros/setConfiguration" />
-        <param name="wc_srv_set_conf_timeout" value="1.0" />  <!-- timeout for this service [s], comment it for no timeout-->
-        <param name="wc_srv_get_conf_name" value="/KukaNode/GetConfiguration" />
-        <param name="wc_srv_get_conf_type" value="kuka_ros/getConfiguration" />
-        <param name="wc_srv_get_conf_timeout" value="0.05" /> <!-- timeout for this service [s], comment it for no timeout-->
 
         <!-- Belt's params -->
         <param name="belt_tp_automode" value="/ui/belt_automode" />
-        <param name="belt_srv_operate_name" value="operate_PLC" />
-        <param name="belt_srv_operate_type" value="plc_comm/plc_service" />
-        <param name="belt_srv_operate_timeout" value="1.0" /> <!-- timeout for this service [s], comment it for no timeout-->
+        <param name="belt_tp_activated" value="/ui/belt_activated" />
+        <param name="belt_tp_forward" value="/ui/belt_forward" />
+        <param name="belt_tp_speed" value="/ui/belt_speed" />
+        <param name="belt_srv_operate_plc" value="/operate_PLC" />
+        <param name="belt_srv_operate_plc_timeout" value="1.0" /> <!-- timeout for this service [s], comment it for no timeout-->
 
         <!-- HMI control topic for Workcell -->
         <param name="tp_ui_str_control" value="/ui/str_control_workcell" />
 
         <!-- Rate for publishing topics [Hz] -->
         <param name="publishing_rate" value="20" />
-
-        <!-- Other params -->
-        <param name="kuka_joints_steps" value="[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]" />
     </node>
 </launch>
