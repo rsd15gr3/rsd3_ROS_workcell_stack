@@ -19,8 +19,7 @@ calling services:
 """
 
 import rospy
-from std_msgs.msg import String
-from msgs.msg import BoolStamped, IntStamped
+from std_msgs.msg import String, Bool, Int8
 from plc_comm.srv import plc_service as plc_service_type
 
 
@@ -37,9 +36,9 @@ class WorkcellHMI():
 
         ''' Setup topics '''
         # Setup Workcell automode publish topic
-        self.tp_automode_message = BoolStamped()
+        self.tp_automode_message = Bool()
         self.tp_automode_message.data = False
-        self.tp_automode_publisher = rospy.Publisher(self.tp_automode, BoolStamped, queue_size=1)
+        self.tp_automode_publisher = rospy.Publisher(self.tp_automode, Bool, queue_size=1)
 
     def decode_control(self, data):
         if data[1] == 'mode':
@@ -49,8 +48,7 @@ class WorkcellHMI():
                 self.tp_automode_message.data = False
 
     def publish_tp_automode_message(self):
-        self.tp_automode_message.header.stamp = rospy.get_rostime()
-        self.tp_automode_publisher.publish (self.tp_automode_message)
+        self.tp_automode_publisher.publish(self.tp_automode_message)
 
 
 class BeltHMI():
@@ -77,24 +75,24 @@ class BeltHMI():
         
         ''' Setup topics '''
         # Setup Belt automode publish topic
-        self.tp_automode_message = BoolStamped()
+        self.tp_automode_message = Bool()
         self.tp_automode_message.data = self.automode
-        self.tp_automode_publisher = rospy.Publisher(self.tp_automode, BoolStamped, queue_size=1)
+        self.tp_automode_publisher = rospy.Publisher(self.tp_automode, Bool, queue_size=1)
         
         # Setup Belt activated publish topic
-        self.tp_activated_message = BoolStamped()
+        self.tp_activated_message = Bool()
         self.tp_activated_message.data = self.activated
-        self.tp_activated_publisher = rospy.Publisher(self.tp_activated, BoolStamped, queue_size=1)
+        self.tp_activated_publisher = rospy.Publisher(self.tp_activated, Bool, queue_size=1)
         
         # Setup Belt forward publish topic
-        self.tp_forward_message = BoolStamped()
+        self.tp_forward_message = Bool()
         self.tp_forward_message.data = self.forward
-        self.tp_forward_publisher = rospy.Publisher(self.tp_forward, BoolStamped, queue_size=1)
+        self.tp_forward_publisher = rospy.Publisher(self.tp_forward, Bool, queue_size=1)
         
         # Setup Belt speed publish topic
-        self.tp_speed_message = IntStamped()
+        self.tp_speed_message = Int8()
         self.tp_speed_message.data = self.speed
-        self.tp_speed_publisher = rospy.Publisher(self.tp_speed, IntStamped, queue_size=1)
+        self.tp_speed_publisher = rospy.Publisher(self.tp_speed, Int8, queue_size=1)
 
     def decode_control(self, data):
         if data[1] == 'srv':
@@ -145,22 +143,18 @@ class BeltHMI():
         self.publish_tp_speed_message()
 
     def publish_tp_automode_message(self):
-        self.tp_automode_message.header.stamp = rospy.get_rostime()
         self.tp_automode_message.data = self.automode
         self.tp_automode_publisher.publish(self.tp_automode_message)
         
     def publish_tp_activated_message(self):
-        self.tp_activated_message.header.stamp = rospy.get_rostime()
         self.tp_activated_message.data = self.activated
         self.tp_activated_publisher.publish(self.tp_activated_message)
         
     def publish_tp_forward_message(self):
-        self.tp_forward_message.header.stamp = rospy.get_rostime()
         self.tp_forward_message.data = self.forward
         self.tp_forward_publisher.publish(self.tp_forward_message)
         
     def publish_tp_speed_message(self):
-        self.tp_speed_message.header.stamp = rospy.get_rostime()
         self.tp_speed_message.data = self.speed
         self.tp_speed_publisher.publish(self.tp_speed_message)
 
