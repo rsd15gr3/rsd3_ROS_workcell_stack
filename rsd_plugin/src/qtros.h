@@ -14,6 +14,7 @@
 #include "kuka_ros/getConfiguration.h"
 #include "kuka_ros/setConfiguration.h"
 #include <std_msgs/Bool.h>
+#include <std_msgs/Int8.h>
 #include <QThread>
 #include <QObject>
 
@@ -37,13 +38,13 @@ class QtROS : public QThread {
     void rosQuits();
     void autoControlEnabledSignal(bool); //requst for manual control
     void newImage(cv::Mat);
-    void newOrder();
+    void newOrder(int);
     void updateConfiguration(kuka_ros::getConfiguration);
   private:
     bool autoControlEnabled = true;
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     void manualControlCallback(const std_msgs::Bool::ConstPtr& msg);
-    void orderCallback(const std_msgs::Bool::ConstPtr& msg);
+    void orderCallback(const std_msgs::Int8::ConstPtr& msg);
     bool setConfigurationCallback(kuka_ros::setConfiguration::Request &req, kuka_ros::setConfiguration::Response &res);
     bool quitfromgui;
     sensor_msgs::ImageConstPtr _imageIn;

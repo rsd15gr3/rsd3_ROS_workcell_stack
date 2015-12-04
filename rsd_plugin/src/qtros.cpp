@@ -10,8 +10,8 @@ QtROS::QtROS(): _it(_nh) {
   ROS_INFO("Connected to roscore");
   //_image_sub = _it.subscribe(SUBSCRIBER, 1, &QtROS::imageCallback, this);
    setConfigurationService = _nh.advertiseService("/rsdPlugin/SetConfiguration", &QtROS::setConfigurationCallback, this);
-   manualControl_sub = _nh.subscribe("/wc_automode", 1, &QtROS::manualControlCallback, this);
-   order_sub = _nh.subscribe("/wc_order", 1,&QtROS::orderCallback,this); ///NEEDS TESTING
+   manualControl_sub = _nh.subscribe("/ui/wc_automode", 1, &QtROS::manualControlCallback, this);
+   order_sub = _nh.subscribe("/ui/mes", 1,&QtROS::orderCallback,this); ///NEEDS TESTING
   quitfromgui = false; }
 
 void QtROS::quitNow(){ 
@@ -31,10 +31,11 @@ void QtROS::imageCallback(const sensor_msgs::ImageConstPtr& msg)
     }
 }
 
-void QtROS::orderCallback(const std_msgs::Bool::ConstPtr& msg) //change msg type
+void QtROS::orderCallback(const std_msgs::Int8::ConstPtr& msg) //change msg type
 {
   ///get order
-    emit newOrder();
+
+    emit newOrder(msg->data);
 }
 
 void QtROS::manualControlCallback(const std_msgs::Bool::ConstPtr& msg)
