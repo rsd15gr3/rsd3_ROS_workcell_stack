@@ -2,6 +2,7 @@
 
 #define GripperDelay 500 //ms
 #define MAXFAILS 5
+#define ImageDelay 250000
 
 enum States{
     IDLE,
@@ -156,7 +157,7 @@ void state_machine::run(){
               case CHECK_BRICKS:
                   cout << "CHECK_BRICKS" << endl;
                   // Get brick positions
-                  usleep(500000); //delay (let the image nodes get newest image)
+                  usleep(ImageDelay); //delay (let the image nodes get newest image)
                   if( srv_call.OrderedBrickPresent() && failCounter < MAXFAILS){
                       old_state = state;
                       state = MOVING;
@@ -195,7 +196,7 @@ void state_machine::run(){
               case CHECK_PICK:
                   cout << "CHECK_PICK" << endl;
                   // Capture image.
-                  usleep(500000);  //delay (let the image nodes get newest image)
+                  usleep(ImageDelay);  //delay (let the image nodes get newest image)
                   if( srv_call.checkPick() ){ ///TODO: check if we have a brick grap
                       old_state = state;
                       state = MOVING;

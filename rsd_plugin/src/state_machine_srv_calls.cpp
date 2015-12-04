@@ -391,7 +391,7 @@ std::vector<brick> state_machine_srv_calls::getBricks()
     cout << _brick_srv.response << endl;
     if(!(_brick_srv.response.x.size() > 0))
     {
-        cout << "Error: Failed to call brick service!" << endl;
+        cout << "No bricks found" << endl;
         return bricks;
     }
 

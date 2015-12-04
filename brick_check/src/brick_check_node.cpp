@@ -38,8 +38,8 @@ bool checkBrick(brick_check::check_brick::Request &req, brick_check::check_brick
     double Floor_proportion, total;
     if(req.type == 3)
     {
-    cv::imshow("region",Frobregion);
-    cv::waitKey(100);
+    //cv::imshow("region",Frobregion);
+    //cv::waitKey(100);
     cv::cvtColor(Frobregion, FrobGreyScale, CV_BGR2GRAY);
     cv::threshold(FrobGreyScale, FrobThres, 100, 255, cv::THRESH_BINARY);
     total = FrobThres.cols * FrobThres.rows;
