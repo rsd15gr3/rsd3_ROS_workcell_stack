@@ -1,6 +1,6 @@
 #!/bin/bash
 #Make sure the catkin_ws is sourced
-source ../../devel/setup.sh
+source ../../../devel/setup.sh
 #Launch the robot camera node in a new terminal (also start roscore if it not running)
 #xterm -e roslaunch robot_camera_launch robo_cam.launch & #brick detection launched the camera
 export ROS_IP=$(hostname -I | awk '{print $1}') #set ROS_IP to the current wifi IP
