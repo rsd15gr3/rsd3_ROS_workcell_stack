@@ -37,6 +37,7 @@ state_machine::state_machine(rw::models::WorkCell::Ptr _wc, rw::kinematics::Stat
   stateprinted = false;
   failCounter = 0;
   position = INIT;
+  state = IDLE;
   timer = new QTimer(this);
   timer->setSingleShot(true);
   connect(timer, SIGNAL(timeout()), this, SLOT(gripperTimeslot()));
@@ -46,16 +47,30 @@ state_machine::state_machine(rw::models::WorkCell::Ptr _wc, rw::kinematics::Stat
 }
 
 void state_machine::SetIdle(bool _idle){
-    if(_idle)
+    if(_idle){
         state = IDLE;
+        srv_call.conveyorBeltStop();
+    }
     else{
         state = READY;
     }
 
 }
 
-void state_machine::newOrder(){
-    //update order
+void state_machine::newOrder(int color){
+srv_call.currentOrder.clear();
+    switch(color){
+        case 1: //red
+            srv_call.currentOrder.push_back(0);
+            break;
+        case 2://blue
+            srv_call.currentOrder.push_back(2);
+            break;
+        case 3: //yellow
+            srv_call.currentOrder.push_back(1);
+            break;
+    }
+    cout << "NewOrdersignal: " << color << endl;
 }
 
 void state_machine::gripperTimeslot(){
@@ -70,6 +85,7 @@ void state_machine::autoControlEnabled(bool _autoenabled){
     if(_autoenabled)
     {
         state = IDLE;
+        srv_call.conveyorBeltStop();
     }
     else //Start statemachine again
     {
@@ -86,13 +102,25 @@ void state_machine::run(){
       {
               case IDLE:
                   cout << "IDLE" << endl;
+                  moving = false;
+                  beltRunning = false;
                   break;
 
               case READY:
-                  cout << "READY" << endl;
-                  old_state = state;
-                  state = MOVING;
-                  position = CAMERA;
+
+                  if(!stateprinted){
+                      cout << "READY" << endl;
+                      stateprinted = true;
+                  }
+                  if(!srv_call.currentOrder.empty())
+                  {
+                      cout << "Current order: " << endl;
+                      for(int color : srv_call.currentOrder){  cout << color << endl; }
+                      stateprinted = false;
+                      old_state = state;
+                      state = MOVING;
+                      position = CAMERA;
+                  }
                   break;
 
               case START_BELT:
@@ -128,6 +156,7 @@ void state_machine::run(){
               case CHECK_BRICKS:
                   cout << "CHECK_BRICKS" << endl;
                   // Get brick positions
+                  usleep(500000); //delay (let the image nodes get newest image)
                   if( srv_call.OrderedBrickPresent() && failCounter < MAXFAILS){
                       old_state = state;
                       state = MOVING;
@@ -166,6 +195,7 @@ void state_machine::run(){
               case CHECK_PICK:
                   cout << "CHECK_PICK" << endl;
                   // Capture image.
+                  usleep(500000);  //delay (let the image nodes get newest image)
                   if( srv_call.checkPick() ){ ///TODO: check if we have a brick grap
                       old_state = state;
                       state = MOVING;
@@ -181,12 +211,13 @@ void state_machine::run(){
 
               case OPEN_GRIP:
                   cout << "OPEN_GRIP" << endl;
+                  usleep(500000); //delay (let the image nodes get newest image)
                   if(srv_call.checkFroboPresent()) //wait for frobo
                   {
                       timer->start(GripperDelay);
                       srv_call.openGripper();
                       old_state = state;
-                      srv_call.removeLastPickedFromOrder();
+                      //srv_call.removeLastPickedFromOrder();
                       state = GRIP_OPENED;
                   }
                   else

@@ -9,9 +9,6 @@ state_machine_srv_calls::state_machine_srv_calls(rw::models::WorkCell::Ptr _wc, 
     this->device = _device;
     this->BrickColorToPick = -1;
     //test
-    currentOrder.push_back(0);
-    currentOrder.push_back(1);
-    currentOrder.push_back(2);
 }
 
 bool state_machine_srv_calls::openGripper()
@@ -143,7 +140,7 @@ bool state_machine_srv_calls::OrderedBrickPresent()
     if(!PresentOrderedColors.empty()){ //if the vector is not empty, pick a random color from it
         int randomPresentPrderedColor = PresentOrderedColors[rand() % PresentOrderedColors.size()];
         BrickColorToPick = randomPresentPrderedColor;
-        cout << "Found " << randomPresentPrderedColor << " \"brick type\" to brick" << endl;
+        cout << "Found " << BrickColorToPick << " \"brick type\" to brick" << endl;
         return true;
 
     }
@@ -172,9 +169,10 @@ bool state_machine_srv_calls::closeToConfig(){
         {
             double delta = currentq[i] - lastSetQ[i];
             //cout << "delta[" << i <<"]: " << delta << endl;
-            if(( delta < -0.005 || 0.005 < delta ))
+            if(( delta < -0.001 || 0.001 < delta ))
                 return false;
         }
+
         return true;
     }
     else
@@ -298,7 +296,7 @@ bool state_machine_srv_calls::moveToBrick(double xPos, double yPos,double yRot) 
         cout << "pickupBrick: xPos, yPos or yRot is breaking contraints!" << endl;
         return false;
     }
-    cout << "pickupBrick: x:" << to_string(xPos) << " y: " << to_string(yPos)  << endl;
+    cout << "pickupBrick: x:" << to_string(xPos) << " y: " << to_string(yPos)  << " Rot: " << to_string(yRot) << endl;
     //get frames and calculate Robot->conveyotbelt trasformation
     Frame* conveyorbeltPickupCenter = wc->findFrame("conveyorBeltPickupCenter");
     Transform3D<> _conveyorbeltTopTransformation;
@@ -329,6 +327,7 @@ bool state_machine_srv_calls::moveToBrick(double xPos, double yPos,double yRot) 
     {
         if(!checkQcontraints(q))
         {
+            cout << "moveToBrick: braking contraints!" << endl;
             //log().info() << "pickupBrick: Failed! Found path breaks contraints!\n";
             return false;
         }
@@ -422,7 +421,7 @@ bool state_machine_srv_calls::moveToOrderedBrick(){
                 _colorbricks.push_back(_brick);
             }
     }
-    if(!_colorbricks.empty())
+    if(_colorbricks.size()>0)
     {
         //brick random brick
         brick randomBrick = _colorbricks[rand() % _colorbricks.size()];

@@ -31,13 +31,15 @@ bool checkBrick(brick_check::check_brick::Request &req, brick_check::check_brick
     cv::Rect ROI(input_img_.cols/2-120-10, input_img_.rows-150, 240, 150);
     cv::Mat region = input_img_(ROI);
 
-    cv::Rect FrobROI(1020,440,50,50);
+    cv::Rect FrobROI(1020,430,50,50);
     cv::Mat FrobGreyScale, FrobThres;
     cv::Mat Frobregion = input_img_(FrobROI);
 
     double Floor_proportion, total;
     if(req.type == 3)
     {
+    cv::imshow("region",Frobregion);
+    cv::waitKey(100);
     cv::cvtColor(Frobregion, FrobGreyScale, CV_BGR2GRAY);
     cv::threshold(FrobGreyScale, FrobThres, 100, 255, cv::THRESH_BINARY);
     total = FrobThres.cols * FrobThres.rows;
@@ -95,7 +97,7 @@ bool checkBrick(brick_check::check_brick::Request &req, brick_check::check_brick
         return true;
     }
 
-    if(yellow_proportion > 0.2 && req.type == 1){
+    if(yellow_proportion > 0.3 && req.type == 1){
         ROS_INFO("yellowbrick grasped");
         res.picked = true;
         return true;

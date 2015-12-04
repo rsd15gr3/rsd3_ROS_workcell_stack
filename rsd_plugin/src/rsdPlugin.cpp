@@ -49,6 +49,7 @@ using namespace rws;
 //Q ConfigImgCapture = Q(6,1.453,0.818,0.370,1.154,-1.224,0.458);
 //Q ConfigDropoff = Q(6,0.207,1.584,-0.738,0.000,-0.847,0.207);
 
+bool init = false;
 
 rsdPluginPlugin::rsdPluginPlugin():
     RobWorkStudioPlugin("rsdPlugin plugin", QIcon(":/pa_icon.png"))
@@ -76,6 +77,8 @@ rsdPluginPlugin::rsdPluginPlugin():
     _qtRos = new QtROS();
 
 
+
+
     connect(this, SIGNAL(quitNow()), _qtRos, SLOT(quitNow()));
 
     connect(_qtRos,SIGNAL(autoControlEnabledSignal(bool)),this,SLOT(autoControlEnabled(bool)));
@@ -86,10 +89,11 @@ rsdPluginPlugin::rsdPluginPlugin():
     qRegisterMetaType<kuka_ros::getConfiguration>("kuka_ros::getConfiguration");
     connect(_qtRos,SIGNAL(updateConfiguration(kuka_ros::getConfiguration)), this, SLOT(updateConfiguration(kuka_ros::getConfiguration)));
 
+
     //connect(this, SIGNAL(quitNow()), _state_machine, SLOT(quitNow()));
 
 
-
+    this->TestButtonsEnabled(false);
      //
 
 }
@@ -99,9 +103,10 @@ rsdPluginPlugin::~rsdPluginPlugin()
 }
 
 void rsdPluginPlugin::autoControlEnabled(bool _autoenabled){
+    if(!_btn0->isEnabled()){
     log().info() << "automode enabled: " << _autoenabled << "\n";
-    //_state_machine->SetIdle(!_autoenabled);
-    _btn0->setEnabled(!_autoenabled);
+    _state_machine->SetIdle(_autoenabled);
+    }
 }
 
 
@@ -115,6 +120,9 @@ void rsdPluginPlugin::TestButtonsEnabled(bool _b)
     _btn6->setEnabled(_b);
     _btn7->setEnabled(_b);
     _btn8->setEnabled(_b);
+    _btn9->setEnabled(_b);
+    _btn10->setEnabled(_b);
+    _btn11->setEnabled(_b);
     _xPosdoubleSpinBox->setEnabled(_b);
     _yPosdoubleSpinBox->setEnabled(_b);
     _yRotdoubleSpinBox->setEnabled(_b);
@@ -154,6 +162,7 @@ void rsdPluginPlugin::open(WorkCell* workcell)
     _device = _wc->findDevice("KR6");
     _state_machine = new state_machine(_wc,_state,_device);
     _qtRos->start();
+
 }
 
 void rsdPluginPlugin::close() {
@@ -170,9 +179,10 @@ void rsdPluginPlugin::btnPressed() {
 	QObject *obj = sender();
     if(obj==_btn0){
         log().info() << "Button 0 pressed ()\n";
-        this->TestButtonsEnabled(false); //disable test buttons and start statemachine
-        _state_machine->SetIdle(false);
+         //disable test buttons and start statemachine
+        connect(_qtRos,SIGNAL(newOrder(int)),_state_machine,SLOT(newOrder(int)));
         _state_machine->start();
+        _btn0->setEnabled(false);
         //_state_machine->SetIdle(false); //start the statemachine
     } /*else if(obj==_btn1){
         log().info() << "Button 1 pressed (go to ImgCapture pos)\n";

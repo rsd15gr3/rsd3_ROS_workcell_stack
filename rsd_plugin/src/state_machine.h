@@ -31,7 +31,7 @@ class state_machine : public QThread {
         void Error();
     public slots:
         void autoControlEnabled(bool);
-        void newOrder();
+        void newOrder(int color);
         void quitNow();
         void gripperTimeslot();
         void ErrorAck();
